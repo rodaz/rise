@@ -42,4 +42,13 @@ router.post('/save', function (req, res) {
 	res.end();
 });
 
+router.get('/edit', function(req, res) {
+	res.render('edit');
+});
+
+router.post('/saveOne', function(req, res) {
+	console.log('here: '+req.body.date+' '+typeof req.body.date)
+	res.end();
+});
+
 module.exports = router;
