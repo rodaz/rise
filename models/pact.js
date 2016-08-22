@@ -7,9 +7,10 @@ var pactSchema = mongoose.Schema({
 	date_close: Date,
 	partner: String,
 	subject: String,
-	amount: Number,
+	amount: String,
 	currency: String,
 	validity: Date,
+	key: String,
 	exec: String,
 	done: Boolean
 });

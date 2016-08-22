@@ -6,10 +6,10 @@ function load() {
   	);
 }
 var arr = [
-			['QWE', '123457', new Date(), new Date(), 'Kolya', 'Tema', 12, 'UAH', new Date(), 'Loki', true],
-			['ASD', '123457', new Date(), new Date(), 'Kolya', 'Tema', 12, 'UAH', new Date(), 'Loki', true],
-			['QZC', '334213', new Date(), new Date(), 'Kolya', 'Tema', 12, 'UAH', new Date(), 'Loki', true],
-			['TYU', '123457', new Date(), new Date(), 'Kolya', 'Tema', 12, 'UAH', new Date(), 'Loki', true]
+			['АХО', '75/01,16М', new Date(2015, 11, 25), new Date(2016, 1, 1), 'ТОВ Днепруниверсал', 'вывоз бытовых отходов', 'счет', 'UAH', new Date(2016, 11, 31), '35809022', 'Баранов А.С.', false],
+			['ОГТ', '', new Date(2016, 0, 18), new Date(2016, 11, 1), 'ООО МВМ Груп ЛТД', 'покупка интструмента', 'спец', 'UAH', new Date(2016, 11, 31), '39470596', 'Яковлева Н.И.', false],
+			['ОГМ', '242', new Date(2016, 0, 18), new Date(2015, 11, 18), 'ООО Промтехаудит', 'работы по монтажу и демонтажу крана мостового', '15928.46', 'UAH', new Date(2016, 2, 31), '36840681', 'Молдован А.В.', false],
+			['ОИТ', '473042', new Date(2016, 0, 25), new Date(2016, 1, 11), 'ПАТ КБ Приватбанк', 'денежные средства', '70000.00', 'USD', new Date(2016, 11, 31), '35809022', 'Баранов А.С.', false]
 		];
 function save() {
 	$.post(
@@ -20,10 +20,10 @@ function save() {
 
 function create(data) {
 	var content = "<table class='table'>";
-	for(i=0; i<data.length-1; i++){
+	for(i=0; i<data.length; i++){
 		content += '<tr>';
-		for(j=0; j<data[i].length-1; j++){
-			content += '<td>' + data[i][j] + '</td>';
+		for(key in data[i]){
+			content += '<td>' + data[i][key] + '</td>';
 		}
 		content += '</tr>';
 	}
