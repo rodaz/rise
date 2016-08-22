@@ -1,0 +1,11 @@
+extends layout
+
+block content
+	a(href='/signout', class='text-center new-account') Sign Out
+	p Hello
+	button.btn.btn-default(onclick='load()') Load
+	button.btn.btn-default(onclick='save()') Save
+	#core
+	script(src='/javascripts/reborn.js')
+	//- #table(class='hot handsontable htColumnHeaders')
+	//- script(src='/javascripts/script.js')
