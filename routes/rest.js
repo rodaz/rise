@@ -2,18 +2,14 @@ var express = require('express');
 var router = express.Router();
 var Pact = require('../models/pact');
 
-var data = [
-	['hello', 'hi', 'kia', 78, 45],
-	['hello', 'hi', 'kiac', 478, 45],
-	['hello', 'hi', 'kiaz', 578, 45],
-	['hello', 'hi', 'kiax', 678, 45]
-];
+var data;
 
 router.post('/load', function (req, res) {
 	console.log('true');
 	Pact.find(function(err, pacts) {
 		if(err) return console.log(err);
 		console.log(pacts);
+		data = pacts;
 		res.send(pacts);
 	});
 });
@@ -42,8 +38,12 @@ router.post('/save', function (req, res) {
 	res.end();
 });
 
-router.get('/edit', function(req, res) {
-	res.render('edit');
+router.get('/edit/:id', function(req, res) {
+	Pact.findOne({_id: req.params.id}, function(err, find_pact) {
+		if(err) return console.log(err);
+		console.log(find_pact);
+		res.render('edit', { pact: find_pact});
+	});
 });
 
 router.post('/saveOne', function(req, res) {

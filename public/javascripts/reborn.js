@@ -22,7 +22,7 @@ function create(data) {
 	var content = "<table class='table'>";
 	for(i=0; i<data.length; i++){
 		content += '<tr>';
-		content += '<td><a href=\'rest/edit/'+data[i]._id+')\'>Edit</a></td>';
+		content += '<td><a href=\'rest/edit/'+data[i]._id+'\'>Edit</a></td>';
 		for(key in data[i]){
 			content += '<td>' + data[i][key] + '</td>';
 		}
