@@ -18,12 +18,21 @@ function save() {
 	);
 }
 
+function search(){
+
+}
+
+function add(){
+	
+}
+
 function create(data) {
-	var content = "<table class='table'>";
+	var content = "<table class='table table-bordered root'>";
 	for(i=0; i<data.length; i++){
 		content += '<tr>';
 		content += '<td><a href=\'rest/edit/'+data[i]._id+'\'>Edit</a></td>';
 		for(key in data[i]){
+			if (key == '_id' || key == '__v') continue; 
 			content += '<td>' + data[i][key] + '</td>';
 		}
 		content += '</tr>';

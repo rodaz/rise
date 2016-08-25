@@ -1,0 +1,58 @@
+extends layouth
+
+block content
+	form.col-lg-2.addForm(method='post' action='/rest/addOne')
+		.form-group
+			label(for='branch') bran
+			input.form-control#branch(list='branches' name='branch')
+			datalist#branches
+				each el in pacts
+					option(value=el.branch)
+		.form-group
+			label(for='partner_id') id
+			input.form-control#partner_id(type='text' name='partner_id')
+		.form-group
+			label(for='date1') dt1
+			input.form-control#date1(type='date' name='reg')
+		.form-group
+			label(for='date2') dt2
+			input.form-control#date2(type='date' name='close')
+		.form-group
+			label(for='partner') Kontr
+			input.form-control#partner(list='partners' name='partner')
+			datalist#partners
+				each el in pacts
+					option(value=el.partner)
+		.form-group
+			label(for='theme') Theme
+			input.form-control#theme(type='text')
+		.form-group
+			label(for='amount') Amount
+			input.form-control#amount(type='text')
+		.form-group
+			label(for='curr') Curr
+			input.form-control#curr(list='currs' name='curr')
+			datalist#currs
+				option(value='UAH')
+				option(value='USD')
+				option(value='RUR')
+				option(value='EUR')
+		.form-group
+			label(for='date') Date
+			input.form-control#date(type='date')
+		.form-group
+			label(for='key') Key
+			input.form-control#key(type='text')
+		.form-group
+			label(for='exec') Exec
+			input.form-control#exec(list='execs' name='exec')
+			datalist#execs
+				each el in pacts
+					option(value=el.exec)
+		.form-group
+			label(for='done') Done?
+			input.form-control#done(list='dones' name='done')
+			datalist#dones
+				option(value='Утвержден')
+				option(value='Не утвержден')
+		input.form-control(value='Save' type='submit')

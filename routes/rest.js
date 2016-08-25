@@ -19,16 +19,16 @@ router.post('/save', function (req, res) {
 		var pact = new Pact({
 			branch: row[0]?row[0]:'',
 			partner_id: row[1]?row[1]:'',
-			date_reg: row[2]?row[1]:new Date(),
-			date_close: row[3]?row[1]:new Date(),
-			partner: row[4]?row[1]:'',
-			subject: row[5]?row[1]:'',
-			amount: row[6]?row[1]:'',
-			currency: row[7]?row[1]:'',
-			validity: row[8]?row[1]:new Date(),
-			key: row[9]?row[1]:'',
-			exec: row[10]?row[1]:'',
-			done: row[11]?row[1]:false
+			date_reg: row[2]?row[2]:new Date(),
+			date_close: row[3]?row[3]:new Date(),
+			partner: row[4]?row[4]:'',
+			subject: row[5]?row[5]:'',
+			amount: row[6]?row[6]:'',
+			currency: row[7]?row[7]:'',
+			validity: row[8]?row[8]:new Date(),
+			key: row[9]?row[9]:'',
+			exec: row[10]?row[10]:'',
+			done: row[11]?row[11]:false
 		});
 		pact.save(function (err) {
 			if (err) console.log(err);
@@ -47,8 +47,39 @@ router.get('/edit/:id', function(req, res) {
 });
 
 router.post('/saveOne', function(req, res) {
-	console.log('here: '+req.body.date+' '+typeof req.body.date)
+	var row = req.body;
+	console.log(row);
+
+	var pact = new Pact({
+			branch: row[1]?row[1]:'',
+			partner_id: row[2]?row[2]:'',
+			date_reg: row[3]?row[3]:new Date(),
+			date_close: row[4]?row[4]:new Date(),
+			partner: row[5]?row[5]:'',
+			subject: row[6]?row[6]:'',
+			amount: row[7]?row[7]:'',
+			currency: row[8]?row[8]:'',
+			validity: row[9]?row[9]:new Date(),
+			key: row[10]?row[10]:'',
+			exec: row[11]?row[11]:'',
+			done: row[12]?row[12]:false
+		});
+	Pact.findOneAndUpdate({_id: row._id}, pact, function(err){
+		if(err) console.log(err);
+	});
 	res.end();
+});
+
+router.get('/addj', function(req, res){
+	Pact.find(function(err, pacts){
+			if(err) console.log(err)
+			else {
+				// pacts.forEach(val, function(){
+				// 	des.push(val.department)
+				// });
+				res.render('add', { title: 'Express', pacts: pacts });
+			}
+		});
 });
 
 module.exports = router;

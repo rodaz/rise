@@ -1,0 +1,26 @@
+/*table*/
+.root {
+	margin-left: 5px;
+	margin-top: 15px;
+}
+td {
+	word-wrap: true;
+	max-width: 125px;
+}
+/*buttons load and save*/
+.temp {
+	margin: 10px;
+}
+/*sign out <a>*/
+#sign {
+	margin: 10px;
+	float: right;
+}
+/*dropdowns*/
+.fltr {
+	margin-left: 10px; 
+}
+
+.addForm {
+	margin-left: 40%;
+}

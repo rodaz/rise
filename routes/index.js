@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var Pact = require('../models/pact');
 
 var isAuthenticated = function (req, res, next){
 	if (req.isAuthenticated())
@@ -14,7 +15,17 @@ module.exports = function(passport) {
 	// 	res.render('index', { title: 'Express' });
 	// });
 	router.get('/', function(req, res) {
-		res.render('home', { title: 'Express' });
+		// var des, yes, pas, dos, scs;
+		Pact.find(function(err, pacts){
+			if(err) console.log(err)
+			else {
+				// pacts.forEach(val, function(){
+				// 	des.push(val.department)
+				// });
+				res.render('home', { title: 'Express', pacts: pacts });
+			}
+		});
+		
 	});
 
 	/* Handle login post */
