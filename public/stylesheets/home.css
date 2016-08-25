@@ -18,9 +18,18 @@ td {
 }
 /*dropdowns*/
 .fltr {
-	margin-left: 10px; 
+	margin-left: 10px;
+	margin-right: 10px; 
 }
 
 .addForm {
 	margin-left: 40%;
+}
+
+.fg {
+	margin-left: 10px;
+}
+
+.rem {
+	font-size: 21px;
 }

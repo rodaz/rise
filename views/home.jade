@@ -1,23 +1,35 @@
 extends layouth
 
 block content
-	a#sign(href='/signout', class='text-center new-account') Sign Out
+	a#sign(href='/signout', class='text-center new-account') Выход
 	br
-	button.temp.btn.btn-default(onclick='load()') Load
-	button.temp.btn.btn-default(onclick='save()') Save
-	button.temp.btn.btn-default(onclick="window.location.href='/rest/addj'") Add
-	form.form-inline
-		input.fltr.form-control(list='branches')
-		datalist#branches
-			each el in pacts
-				option(value=el.branch)
-		input.fltr.form-control(list='partners')
-		datalist#partners
-			each el in pacts
-				option(value=el.partner)
-		input.fltr.form-control(list='dns')
-		datalist#dns
-			option(value='Утвержден')
-			option(value='Не утвержден')
-		button.fltr.form-control(onclick='search()') Search
+	button.temp.btn.btn-default#loadbtn(onclick='load()') Load
+	//- button.temp.btn.btn-default(onclick='save()') Save
+	button.temp.btn.btn-default(onclick="window.location.href='/rest/add'") Добавить
+	form.form-inline(method='post' action='/rest/search')
+		.form-group.fg
+			label(for='bra') Отдел
+			input.fltr.form-control(id='bra' list='branches' name='branch')
+			datalist#branches
+				each el in pacts
+					option(value=el.branch)
+		.form-group.fg
+			label(for='part') Контрагент
+			input.fltr.form-control(id='part' list='partners' name='partner')
+			datalist#partners
+				each el in pacts
+					option(value=el.partner)
+		.form-group.fg
+			label(for='ex') Исполнитель				
+			input.fltr.form-control(id='ex' list='execs' name='exec')
+			datalist#execs
+					each el in pacts
+						option(value=el.exec)
+		.form-group.fg
+			label(for='dn') Утверждение					
+			input.fltr.form-control(id='dn' list='dns' name='done')
+			datalist#dns
+				option(value='Утвержден')
+				option(value='Не утвержден')
+		button.fltr.form-control(type='submit') Поиск
 	#core

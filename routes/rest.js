@@ -70,7 +70,7 @@ router.post('/saveOne', function(req, res) {
 	res.end();
 });
 
-router.get('/addj', function(req, res){
+router.get('/add', function(req, res){
 	Pact.find(function(err, pacts){
 			if(err) console.log(err)
 			else {
@@ -80,6 +80,10 @@ router.get('/addj', function(req, res){
 				res.render('add', { title: 'Express', pacts: pacts });
 			}
 		});
+});
+
+router.get('/search', function(req, res){
+	Pact.find({})
 });
 
 module.exports = router;
