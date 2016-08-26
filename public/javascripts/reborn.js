@@ -62,5 +62,3 @@ function create(data) {
 	content += "</table>";
 	$('#core').append(content);
 }
-
-

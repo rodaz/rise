@@ -3,34 +3,34 @@ extends layouth
 block content
 	form.col-lg-2.addForm(method='post' action='/rest/addOne')
 		.form-group
-			label(for='branch') bran
+			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch')
 			datalist#branches
-				each el in pacts
-					option(value=el.branch)
+				each el in deps
+					option(value=el)
 		.form-group
-			label(for='partner_id') id
+			label(for='partner_id') Номер контрагента
 			input.form-control#partner_id(type='text' name='partner_id')
 		.form-group
-			label(for='date1') dt1
+			label(for='date1') Дата регистрации
 			input.form-control#date1(type='date' name='reg')
 		.form-group
-			label(for='date2') dt2
+			label(for='date2') Дата заключения
 			input.form-control#date2(type='date' name='close')
 		.form-group
-			label(for='partner') Kontr
+			label(for='partner') Контрагент
 			input.form-control#partner(list='partners' name='partner')
 			datalist#partners
-				each el in pacts
-					option(value=el.partner)
+				each el in parts
+					option(value=el)
 		.form-group
-			label(for='theme') Theme
+			label(for='theme') Предмет договора
 			input.form-control#theme(type='text')
 		.form-group
-			label(for='amount') Amount
+			label(for='amount') Сумма с ндс.
 			input.form-control#amount(type='text')
 		.form-group
-			label(for='curr') Curr
+			label(for='curr') Валюта
 			input.form-control#curr(list='currs' name='curr')
 			datalist#currs
 				option(value='UAH')
@@ -38,21 +38,21 @@ block content
 				option(value='RUR')
 				option(value='EUR')
 		.form-group
-			label(for='date') Date
+			label(for='date') Срок действия
 			input.form-control#date(type='date')
 		.form-group
-			label(for='key') Key
+			label(for='key') ЕГРПОУ
 			input.form-control#key(type='text')
 		.form-group
-			label(for='exec') Exec
+			label(for='exec') Отв. исполнитель
 			input.form-control#exec(list='execs' name='exec')
 			datalist#execs
-				each el in pacts
-					option(value=el.exec)
+				each el in exes
+					option(value=el)
 		.form-group
-			label(for='done') Done?
+			label(for='done') Утверждение
 			input.form-control#done(list='dones' name='done')
 			datalist#dones
 				option(value='Утвержден')
 				option(value='Не утвержден')
-		input.form-control(value='Save' type='submit')
+		input.form-control#addbtn(value='Добавить' type='submit')

@@ -11,20 +11,20 @@ block content
 			label(for='bra') Отдел
 			input.fltr.form-control(id='bra' list='branches' name='branch')
 			datalist#branches
-				each el in pacts
-					option(value=el.branch)
+				each el in deps
+					option(value=el)
 		.form-group.fg
 			label(for='part') Контрагент
 			input.fltr.form-control(id='part' list='partners' name='partner')
 			datalist#partners
-				each el in pacts
-					option(value=el.partner)
+				each el in parts
+					option(value=el)
 		.form-group.fg
 			label(for='ex') Исполнитель				
 			input.fltr.form-control(id='ex' list='execs' name='exec')
 			datalist#execs
-					each el in pacts
-						option(value=el.exec)
+					each el in exes
+						option(value=el)
 		.form-group.fg
 			label(for='dn') Утверждение					
 			input.fltr.form-control(id='dn' list='dns' name='done')

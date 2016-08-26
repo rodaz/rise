@@ -71,13 +71,22 @@ router.post('/saveOne', function(req, res) {
 });
 
 router.get('/add', function(req, res){
+	var deps=[], parts=[], exes=[];
 	Pact.find(function(err, pacts){
 			if(err) console.log(err)
 			else {
-				// pacts.forEach(val, function(){
-				// 	des.push(val.department)
-				// });
-				res.render('add', { title: 'Express', pacts: pacts });
+				pacts.forEach(function(val) {
+					deps.push(val.department);
+					parts.push(val.partner);
+					exes.push(val.exec);
+				});
+
+				res.render('add', { 
+					title: 'Express', 
+					deps: unique(deps),
+					parts: unique(parts),
+					exes: unique(exes)
+				});
 			}
 		});
 });
@@ -85,5 +94,16 @@ router.get('/add', function(req, res){
 router.get('/search', function(req, res){
 	Pact.find({})
 });
+
+function unique(arr) {
+  var obj = {};
+
+  for (var i = 0; i < arr.length; i++) {
+    var str = arr[i];
+    obj[str] = true;
+  }
+
+  return Object.keys(obj);
+}
 
 module.exports = router;

@@ -24,6 +24,7 @@ td {
 
 .addForm {
 	margin-left: 40%;
+	margin-top: 10px;
 }
 
 .fg {
@@ -32,4 +33,9 @@ td {
 
 .rem {
 	font-size: 21px;
+}
+
+#addbtn {
+	width: 33%;
+	margin-left: 33%;
 }

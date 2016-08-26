@@ -15,14 +15,24 @@ module.exports = function(passport) {
 	// 	res.render('index', { title: 'Express' });
 	// });
 	router.get('/', function(req, res) {
-		// var des, yes, pas, dos, scs;
+		var deps=[], yes=[], parts=[], exes=[];
 		Pact.find(function(err, pacts){
 			if(err) console.log(err)
 			else {
-				// pacts.forEach(val, function(){
-				// 	des.push(val.department)
-				// });
-				res.render('home', { title: 'Express', pacts: pacts });
+				pacts.forEach(function(val) {
+					deps.push(val.department);
+					yes.push(val.date_reg.getFullYear());
+					parts.push(val.partner);
+					exes.push(val.exec);
+				});
+
+				res.render('home', { 
+					title: 'Express', 
+					deps: unique(deps),
+					yes: unique(yes),
+					parts: unique(parts),
+					exes: unique(exes)
+				});
 			}
 		});
 		
@@ -57,6 +67,17 @@ module.exports = function(passport) {
 		res.redirect('/');
 	});
 
+	function unique(arr) {
+	  var obj = {};
+
+	  for (var i = 0; i < arr.length; i++) {
+	    var str = arr[i];
+	    obj[str] = true;
+	  }
+
+	  return Object.keys(obj);
+	}
+	
 	return router;
 
 }
