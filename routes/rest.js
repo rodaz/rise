@@ -73,26 +73,32 @@ router.post('/saveOne', function(req, res) {
 router.get('/add', function(req, res){
 	var deps=[], parts=[], exes=[];
 	Pact.find(function(err, pacts){
-			if(err) console.log(err)
-			else {
-				pacts.forEach(function(val) {
-					deps.push(val.department);
-					parts.push(val.partner);
-					exes.push(val.exec);
-				});
+		if(err) console.log(err)
+		else {
+			pacts.forEach(function(val) {
+				deps.push(val.branch);
+				parts.push(val.partner);
+				exes.push(val.exec);
+			});
 
-				res.render('add', { 
-					title: 'Express', 
-					deps: unique(deps),
-					parts: unique(parts),
-					exes: unique(exes)
-				});
-			}
-		});
+			res.render('add', { 
+				title: 'Express', 
+				deps: unique(deps),
+				parts: unique(parts),
+				exes: unique(exes)
+			});
+		}
+	});
 });
 
-router.get('/search', function(req, res){
-	Pact.find({})
+router.post('/search', function(req, res) {
+	console.log(req.body);
+	// Pact.find({})
+	res.end();
+});
+
+router.post('/add', function() {
+	
 });
 
 function unique(arr) {

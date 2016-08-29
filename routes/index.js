@@ -20,7 +20,7 @@ module.exports = function(passport) {
 			if(err) console.log(err)
 			else {
 				pacts.forEach(function(val) {
-					deps.push(val.department);
+					deps.push(val.branch);
 					yes.push(val.date_reg.getFullYear());
 					parts.push(val.partner);
 					exes.push(val.exec);
