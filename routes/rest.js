@@ -39,11 +39,40 @@ router.post('/save', function (req, res) {
 });
 
 router.get('/edit/:id', function(req, res) {
-	Pact.findOne({_id: req.params.id}, function(err, find_pact) {
-		if(err) return console.log(err);
-		console.log(find_pact);
-		res.render('edit', { pact: find_pact});
+	var deps=[], parts=[], exes=[];
+	Pact.find(function(err, pacts){
+		if(err) console.log(err)
+		else {
+			pacts.forEach(function(val) {
+				deps.push(val.branch);
+				parts.push(val.partner);
+				exes.push(val.exec);
+			});
+
+			Pact.findOne({_id: req.params.id}, function(err, fp) {
+				if(err) return console.log(err);
+				console.log(fp);
+				res.render('edit', {
+					br: fp.branch,
+					id: fp.partner_id,
+					re: fp.date_reg,
+					cl: fp.date_close,
+					pa: fp.partner,
+					th: fp.subject,
+					am: fp.amount,
+					cu: fp.currency,
+					da: fp.date,
+					ke: fp.key,
+					ex: fp.exec,
+					d: fp.done,
+					deps: unique(deps),
+					parts: unique(parts),
+					exes: unique(exes)
+				});
+			});
+		}
 	});
+
 });
 
 router.post('/saveOne', function(req, res) {
@@ -92,13 +121,39 @@ router.get('/add', function(req, res){
 });
 
 router.post('/search', function(req, res) {
+	var params = {};
+	if (req.body.branch) {params.branch = req.body.branch}
+	if (req.body.partner) {params.partner = req.body.partner}
+	if (req.body.exec) {params.exec = req.body.exec}
+	if (req.body.done) {params.done = req.body.done}
 	console.log(req.body);
-	// Pact.find({})
+	Pact.find(params, function(err, search_data) {
+		if(err) console.log(err);
+		console.log(search_data);
+	});
 	res.end();
 });
 
-router.post('/add', function() {
-	
+router.post('/add', function(req, res) {
+	var row = req.body;
+	var pact = new Pact({
+		branch: row.branch?row.branch:'',
+		partner_id: row.partner_id?row.partner_id:'',
+		date_reg: row.reg?row.reg:new Date(),
+		date_close: row.close?row.close:new Date(),
+		partner: row.partner?row.partner:'',
+		subject: row.theme?row.theme:'',
+		amount: row.amount?row.amount:'',
+		currency: row.curr?row.curr:'',
+		validity: row.date?row.date:new Date(),
+		key: row.key?row.key:'',
+		exec: row.exec?row.exec:'',
+		done: row.done?row.done:false
+	});
+	pact.save(function (err) {
+		if (err) console.log(err);
+		console.log('Done '+pact);
+	});
 });
 
 function unique(arr) {

@@ -52,6 +52,8 @@ function create(data) {
 			if (key == 'done') {
 				if (data[i][key] == false) {
 					content += '<td><span class="rem glyphicon glyphicon-remove" aria-hidden="true"></span></td>';
+				} else {
+					content += '<td><span class="rem glyphicon glyphicon-ok" aria-hidden="true"></span></td>';
 				}
 				continue;
 			} 

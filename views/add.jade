@@ -1,7 +1,7 @@
 extends layouth
 
 block content
-	form.col-lg-2.addForm(method='post' action='/rest/addOne')
+	form.col-lg-2.addForm(method='post' action='/rest/add')
 		.form-group
 			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch')
@@ -25,10 +25,10 @@ block content
 					option(value=el)
 		.form-group
 			label(for='theme') Предмет договора
-			input.form-control#theme(type='text')
+			input.form-control#theme(type='text' name='theme')
 		.form-group
 			label(for='amount') Сумма с ндс.
-			input.form-control#amount(type='text')
+			input.form-control#amount(type='text' name='amount')
 		.form-group
 			label(for='curr') Валюта
 			input.form-control#curr(list='currs' name='curr')
@@ -39,10 +39,10 @@ block content
 				option(value='EUR')
 		.form-group
 			label(for='date') Срок действия
-			input.form-control#date(type='date')
+			input.form-control#date(type='date' name='date')
 		.form-group
 			label(for='key') ЕГРПОУ
-			input.form-control#key(type='text')
+			input.form-control#key(type='text' name='key')
 		.form-group
 			label(for='exec') Отв. исполнитель
 			input.form-control#exec(list='execs' name='exec')

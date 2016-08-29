@@ -1,8 +1,58 @@
-extends layout
+extends layouth
 
 block content
-	form(method='post' action='/rest/saveOne')
-		input(type='date' name='date')
-		p=pact
-		button.btn.btn-default(type='submit') Submit
-	script(src='/javascripts/reborn.js')
+	form.col-lg-2.addForm(method='post' action='/rest/saveOne')
+		.form-group
+			label(for='branch') Отдел
+			input.form-control#branch(list='branches' name='branch' value=br)
+			datalist#branches
+				each el in deps
+					option(value=el)
+		.form-group
+			label(for='partner_id') Номер контрагента
+			input.form-control#partner_id(type='text' name='partner_id' value=id)
+		.form-group
+			label(for='date1') Дата регистрации
+			input.form-control#date1(type='date' name='reg' value=re)
+		.form-group
+			label(for='date2') Дата заключения
+			input.form-control#date2(type='date' name='close' value=cl)
+		.form-group
+			label(for='partner') Контрагент
+			input.form-control#partner(list='partners' name='partner' value=pa)
+			datalist#partners
+				each el in parts
+					option(value=el)
+		.form-group
+			label(for='theme') Предмет договора
+			input.form-control#theme(type='text' name='theme' value=th)
+		.form-group
+			label(for='amount') Сумма с ндс.
+			input.form-control#amount(type='text' name='amount' value=am)
+		.form-group
+			label(for='curr') Валюта
+			input.form-control#curr(list='currs' name='curr' value=cu)
+			datalist#currs
+				option(value='UAH')
+				option(value='USD')
+				option(value='RUR')
+				option(value='EUR')
+		.form-group
+			label(for='date') Срок действия
+			input.form-control#date(type='date' name='date' value=da)
+		.form-group
+			label(for='key') ЕГРПОУ
+			input.form-control#key(type='text' name='key' value=ke)
+		.form-group
+			label(for='exec') Отв. исполнитель
+			input.form-control#exec(list='execs' name='exec' value=ex)
+			datalist#execs
+				each el in exes
+					option(value=el)
+		.form-group
+			label(for='done') Утверждение
+			input.form-control#done(list='dones' name='done' value=d)
+			datalist#dones
+				option(value='Утвержден')
+				option(value='Не утвержден')
+		input.form-control#addbtn(value='Добавить' type='submit')
