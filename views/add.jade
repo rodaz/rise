@@ -2,7 +2,7 @@ extends layouth
 
 block content
 	.h1.text-center Добавление нового договора
-	form.addForm(method='post' action='/rest/add')
+	form.addForm(method='post' action='/rest/add' autocomplete='off')
 		.form-group.ots
 			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch')

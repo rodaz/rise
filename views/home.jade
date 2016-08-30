@@ -9,22 +9,22 @@ block content
 
 	.col-md-12.form-inline
 		.form-group
-			input.form-control.sel(list='years' id='year' placeholder="Год")
+			input.form-control.sel(list='years' id='year' placeholder="Год" autocomplete='off')
 			datalist#years
 				each el in yes
 					option(value=el)
 		.form-group
-			input.form-control.sel(list='branches' id='branch' placeholder="Отдел")
+			input.form-control.sel(list='branches' id='branch' placeholder="Отдел" autocomplete='off')
 			datalist#branches
 				each el in deps
 					option(value=el)
 		.form-group.fg
-			input.form-control.sel(list='partners' id='partner' placeholder="Контрагент")
+			input.form-control.sel(list='partners' id='partner' placeholder="Контрагент" autocomplete='off')
 			datalist#partners
 				each el in parts
 					option(value=el)
 		.form-group.fg
-			input.form-control.sel(list='execs' id='exec' placeholder="Исполнитель")
+			input.form-control.sel(list='execs' id='exec' placeholder="Исполнитель" autocomplete='off')
 			datalist#execs
 					each el in exes
 						option(value=el)
