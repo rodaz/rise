@@ -3,33 +3,31 @@ extends layouth
 block content
 	a#sign(href='/signout', class='text-center new-account') Выход
 	br
-	button.temp.btn.btn-default#loadbtn(onclick='load()') Load
-	//- button.temp.btn.btn-default(onclick='save()') Save
-	button.temp.btn.btn-default(onclick="window.location.href='/rest/add'") Добавить
-	form.form-inline(method='post' action='/rest/search')
-		.form-group.fg
-			label(for='bra') Отдел
-			input.fltr.form-control(id='bra' list='branches' name='branch')
+
+	.col-md-4
+		button.temp.btn.btn-default(onclick="window.location.href='/rest/add'") Добавить
+
+	.col-md-12.form-inline
+		.form-group
+			input.form-control.sel(list='years' id='year' placeholder="Год")
+			datalist#years
+				each el in yes
+					option(value=el)
+		.form-group
+			input.form-control.sel(list='branches' id='branch' placeholder="Отдел")
 			datalist#branches
 				each el in deps
 					option(value=el)
 		.form-group.fg
-			label(for='part') Контрагент
-			input.fltr.form-control(id='part' list='partners' name='partner')
+			input.form-control.sel(list='partners' id='partner' placeholder="Контрагент")
 			datalist#partners
 				each el in parts
 					option(value=el)
 		.form-group.fg
-			label(for='ex') Исполнитель				
-			input.fltr.form-control(id='ex' list='execs' name='exec')
+			input.form-control.sel(list='execs' id='exec' placeholder="Исполнитель")
 			datalist#execs
 					each el in exes
 						option(value=el)
-		.form-group.fg
-			label(for='dn') Утверждение					
-			input.fltr.form-control(id='dn' list='dns' name='done')
-			datalist#dns
-				option(value='Утвержден')
-				option(value='Не утвержден')
-		button.fltr.form-control(type='submit') Поиск
+		button.form-control.sel#search(type='submit') Поиск
+	br
 	#core

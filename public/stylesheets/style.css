@@ -1,0 +1,47 @@
+	body
+		{background-image: url(/images/stripe.png);
+		background-repeat:repeat;
+		padding-bottom: 1%;}
+
+	tr:nth-child(2n)
+		{background-color: #f9f9f9!important;
+		background-image: url(/images/stripe-dark.png);
+		background-repeat:repeat;}
+
+	#core
+		{font-size: 12px!important;}
+
+	#sign
+		{margin: 1%;
+		float: right;}
+
+	.sel
+		{margin: 10px 5px 10px 5px;}
+	.sel:first-child
+		{margin-left: 0;}
+
+	.col-md-12
+		{text-align: center;}
+
+	.addForm
+		{max-width: 250px;
+		margin-left: 40%;}
+
+	.form-control
+		{margin-bottom: 0px;}
+
+	.ots
+		{background-image: url(/images/stripe-dark.png)!important;
+		border: 1px solid #e7e7e7;
+		padding: 10px;
+		border-radius:6px; 
+		-webkit-border-radius:6px; 
+		-moz-border-radius:5px; 
+		-khtml-border-radius:10px;}
+
+	.h1
+		{padding-bottom: 2%;}
+
+	.form-inline
+		{padding-bottom: 2%;}
+

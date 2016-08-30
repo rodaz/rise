@@ -1,35 +1,36 @@
 extends layouth
 
 block content
-	form.col-lg-2.addForm(method='post' action='/rest/add')
-		.form-group
+	.h1.text-center Добавление нового договора
+	form.addForm(method='post' action='/rest/add')
+		.form-group.ots
 			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch')
 			datalist#branches
 				each el in deps
 					option(value=el)
-		.form-group
+		.form-group.ots
 			label(for='partner_id') Номер контрагента
 			input.form-control#partner_id(type='text' name='partner_id')
-		.form-group
+		.form-group.ots
 			label(for='date1') Дата регистрации
 			input.form-control#date1(type='date' name='reg')
-		.form-group
+		.form-group.ots
 			label(for='date2') Дата заключения
 			input.form-control#date2(type='date' name='close')
-		.form-group
+		.form-group.ots
 			label(for='partner') Контрагент
 			input.form-control#partner(list='partners' name='partner')
 			datalist#partners
 				each el in parts
 					option(value=el)
-		.form-group
+		.form-group.ots
 			label(for='theme') Предмет договора
 			input.form-control#theme(type='text' name='theme')
-		.form-group
+		.form-group.ots
 			label(for='amount') Сумма с ндс.
 			input.form-control#amount(type='text' name='amount')
-		.form-group
+		.form-group.ots
 			label(for='curr') Валюта
 			input.form-control#curr(list='currs' name='curr')
 			datalist#currs
@@ -37,22 +38,19 @@ block content
 				option(value='USD')
 				option(value='RUR')
 				option(value='EUR')
-		.form-group
+		.form-group.ots
 			label(for='date') Срок действия
 			input.form-control#date(type='date' name='date')
-		.form-group
+		.form-group.ots
 			label(for='key') ЕГРПОУ
 			input.form-control#key(type='text' name='key')
-		.form-group
+		.form-group.ots
 			label(for='exec') Отв. исполнитель
 			input.form-control#exec(list='execs' name='exec')
 			datalist#execs
 				each el in exes
 					option(value=el)
-		.form-group
-			label(for='done') Утверждение
-			input.form-control#done(list='dones' name='done')
-			datalist#dones
-				option(value='Утвержден')
-				option(value='Не утвержден')
-		input.form-control#addbtn(value='Добавить' type='submit')
+		.form-group.ots
+			label(for='done') Примечание
+			input.form-control#done(name='done')
+		input.form-control.btn-success#addbtn(value='Добавить' type='submit')
