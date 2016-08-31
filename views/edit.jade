@@ -2,7 +2,7 @@ extends layouth
 
 block content
 	.h1.text-center Редактирование договора
-	form.addForm(method='post' action='/rest/save')
+	form.addForm(method='post' action='/rest/save' autocomplete='off')
 		input(type='hidden' name='_id' value=_i)
 		.form-group.ots
 			label(for='branch') Отдел

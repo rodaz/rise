@@ -8,13 +8,33 @@ $(document).ready(function(){
 			done: $('#done').val()
 		}, function (data) {
 			create(data);
+			$('#root').tablesorter({
+				dateFormat: "ddmmyyyy",
+				theme : "bootstrap",
+
+			    widthFixed: true,
+
+			    headerTemplate : '{content} {icon}', 
+
+			    // widget code contained in the jquery.tablesorter.widgets.js file
+			    // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+			    widgets : [ "uitheme", "filter"],
+
+			    widgetOptions : {
+			      // reset filters button
+			      filter_hideFilters: true,
+
+			      // extra css class name (string or array) added to the filter element (input or select)
+			      filter_cssFilter: "form-control"
+			  	}
+			});
 		});
 	});
 
 	function create(data) {
         var core = $('#core');
-		var content = "<table class='table table-bordered root'>";
-		content += '<tr>'+
+		var content = "<table class='table table-bordered tablesorter' id='root'>";
+		content += '<thead><tr>'+
 			'<th>Ред.</th>'+
 			'<th>Отдел</th>'+
 			'<th>№ контрагента</th>'+
@@ -28,7 +48,7 @@ $(document).ready(function(){
 			'<th>ЕГРПОУ</th>'+
 			'<th>Отв. исполнитель</th>'+
 			'<th>Примечание</th>'+
-		'</tr>';
+		'</tr></thead><tbody>';
 		for(var i=0; i<data.length; i++){
 			content += '<tr>';
 			content += '<td><a href=\'rest/edit/'+data[i]._id+'\'><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>';
@@ -39,16 +59,22 @@ $(document).ready(function(){
 					continue;
 				}
 				if (key == 'validity') {
-				    if (moment(data[i][key]) > moment().subtract(2, 'days'))
-                        content += '<td class=\'warn\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
-                    else content += '<td>' + moment(data[i][key]).format('L') + '</td>';
+				    if (moment(data[i][key]) < moment())
+                        content += '<td class=\'danger\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+                    else if (moment(data[i][key]) < moment().add(2, 'days'))
+                    		content += '<td class=\'warning\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+                    	else content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
                     continue;
+                }
+                if (key == 'partner') {
+                	content += '<td title=\'helllo from jak\'>' + data[i][key] + '</td>';
+                	continue;
                 }
 				content += '<td>' + data[i][key] + '</td>';
 			}
 			content += '</tr>';
 		}
-		content += "</table>";
+		content += "</tbody></table>";
 		core.empty();
 		core.append(content);
 	}
