@@ -52,9 +52,6 @@ block content
 				each el in exes
 					option(value=el)
 		.form-group.ots
-			label(for='done') Утверждение
-			input.form-control#done(list='dones' name='done' value=d)
-			datalist#dones
-				option(value='Утвержден')
-				option(value='Не утвержден')
+			label(for='done') Примечание
+			input.form-control#done(name='done' value=d)
 		input.form-control.btn.btn-success#addbtn(value='Сохранить' type='submit')

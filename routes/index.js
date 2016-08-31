@@ -27,7 +27,7 @@ module.exports = function(passport) {
 				});
 
 				res.render('home', { 
-					title: 'Express', 
+					title: 'Журнал договоров', 
 					deps: unique(deps),
 					yes: unique(yes),
 					parts: unique(parts),

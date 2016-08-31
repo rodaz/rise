@@ -12,7 +12,7 @@ var pactSchema = mongoose.Schema({
 	validity: Date,
 	key: String,
 	exec: String,
-	done: Boolean
+	done: String
 });
 
 var Pact = mongoose.model('Pact', pactSchema);

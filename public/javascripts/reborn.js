@@ -67,7 +67,7 @@ $(document).ready(function(){
                     continue;
                 }
                 if (key == 'partner') {
-                	content += '<td title=\'helllo from jak \'>' + data[i][key] + '</td>';
+                	content += '<td title=\'Описание контрагента\'>' + data[i][key] + '</td>';
                 	continue;
                 }
 				content += '<td>' + data[i][key] + '</td>';
