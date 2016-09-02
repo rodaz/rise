@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var pactSchema = mongoose.Schema({
+	pact_id: Number,
 	branch: String,
 	partner_id: String,
 	date_reg: Date,

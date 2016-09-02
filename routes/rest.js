@@ -4,17 +4,20 @@ var Pact = require('../models/pact');
 var moment = require('moment');
 
 router.get('/add', function(req, res) {
-    var deps=[], parts=[], exes=[];
+    var deps=[], parts=[], exes=[], ids=[];
     Pact.find(function(err, pacts) {
         if (err) console.log(err)
         else {
             pacts.forEach(function(val) {
+                ids.push(val.pact_id);
                 deps.push(val.branch);
                 parts.push(val.partner);
                 exes.push(val.exec);
             });
-            
-            res.render('add', {  
+            console.log(ids);
+            var t = Math.max.apply(null, ids);
+            res.render('add', {
+                next_id: t?t+1:1,  
                 deps: unique(deps),
                 parts: unique(parts),
                 exes: unique(exes)
@@ -38,6 +41,7 @@ router.get('/edit/:id', function(req, res) {
                 if (err) return console.log(err);
                 res.render('edit', {
                     _i: fp._id,
+                    pid: fp.pact_id,
                     br: fp.branch,
                     id: fp.partner_id,
                     re: moment(fp.date_reg).format('YYYY-MM-DD'),
@@ -63,6 +67,7 @@ router.get('/edit/:id', function(req, res) {
 router.post('/add', function(req, res) {
     var row = req.body;
     var pact = new Pact({
+        pact_id: row.pact_id?row.pact_id:0,
         branch: row.branch?row.branch:'',
         partner_id: row.partner_id?row.partner_id:'',
         date_reg: row.reg?row.reg:moment(),
@@ -85,6 +90,7 @@ router.post('/add', function(req, res) {
 router.post('/save', function(req, res) {
     var row = req.body;
     var pact = {
+            pact_id: row.pact_id?row.pact_id:0,
             branch: row.branch?row.branch:'',
             partner_id: row.partner_id?row.partner_id:'',
             date_reg: row.reg?row.reg:moment(),

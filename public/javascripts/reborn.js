@@ -36,6 +36,7 @@ $(document).ready(function(){
 		var content = "<table class='table table-bordered tablesorter' id='root'>";
 		content += '<thead><tr>'+
 			'<th>Ред.</th>'+
+			'<th>№ рег.</th>'+
 			'<th>Отдел</th>'+
 			'<th>№ контрагента</th>'+
 			'<th>Дата регистрации</th>'+
@@ -49,10 +50,10 @@ $(document).ready(function(){
 			'<th>Отв. исполнитель</th>'+
 			'<th>Примечание</th>'+
 		'</tr></thead><tbody>';
-		for(var i=0; i<data.length; i++){
+		for (var i=0; i<data.length; i++) {
 			content += '<tr>';
 			content += '<td><a href=\'rest/edit/'+data[i]._id+'\'><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>';
-			for(var key in data[i]){
+			for (var key in data[i]) {
 				if (key == '_id' || key == '__v') continue;
 				if (key == 'date_close' || key == 'date_reg') {
 					content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';

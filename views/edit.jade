@@ -5,6 +5,9 @@ block content
 	form.addForm(method='post' action='/rest/save' autocomplete='off')
 		input(type='hidden' name='_id' value=_i)
 		.form-group.ots
+			label(for='pact_id') Номер регистрации
+			input.form-control#pact_id(type='text' name='pact_id' value=pid)
+		.form-group.ots
 			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch' value=br)
 			datalist#branches
