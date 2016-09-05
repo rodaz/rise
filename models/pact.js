@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var pactSchema = mongoose.Schema({
+	done: String,
 	pact_id: Number,
 	branch: String,
 	partner_id: String,
@@ -13,7 +14,8 @@ var pactSchema = mongoose.Schema({
 	validity: Date,
 	key: String,
 	exec: String,
-	done: String
+	scan: Buffer,
+	remark: String
 });
 
 var Pact = mongoose.model('Pact', pactSchema);

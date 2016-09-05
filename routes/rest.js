@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Pact = require('../models/pact');
 var moment = require('moment');
+var fs = require('fs');
 
 router.get('/add', function(req, res) {
     var deps=[], parts=[], exes=[], ids=[];
@@ -17,7 +18,7 @@ router.get('/add', function(req, res) {
             console.log(ids);
             var t = Math.max.apply(null, ids);
             res.render('add', {
-                next_id: t?t+1:1,  
+                next_id: t>0?t+1:1,  
                 deps: unique(deps),
                 parts: unique(parts),
                 exes: unique(exes)
@@ -39,8 +40,10 @@ router.get('/edit/:id', function(req, res) {
 
             Pact.findOne({_id: req.params.id}, function(err, fp) {
                 if (err) return console.log(err);
+                fs.writeFileSync('scan.txt', fp.scan);
                 res.render('edit', {
                     _i: fp._id,
+                    d: fp.done,
                     pid: fp.pact_id,
                     br: fp.branch,
                     id: fp.partner_id,
@@ -53,7 +56,9 @@ router.get('/edit/:id', function(req, res) {
                     da: moment(fp.date).format('YYYY-MM-DD'),
                     ke: fp.key,
                     ex: fp.exec,
-                    d: fp.done,
+                    re: fp.remark,
+                    sc: fp.scan.length>1,
+                    scan: fp.scan,
                     deps: unique(deps),
                     parts: unique(parts),
                     exes: unique(exes)
@@ -67,6 +72,7 @@ router.get('/edit/:id', function(req, res) {
 router.post('/add', function(req, res) {
     var row = req.body;
     var pact = new Pact({
+        done: row.done?row.done:'нет',
         pact_id: row.pact_id?row.pact_id:0,
         branch: row.branch?row.branch:'',
         partner_id: row.partner_id?row.partner_id:'',
@@ -79,7 +85,8 @@ router.post('/add', function(req, res) {
         validity: row.date?row.date:moment(),
         key: row.key?row.key:'',
         exec: row.exec?row.exec:'',
-        done: row.done?row.done:''
+        scan: row.scan?row.scan:new Buffer(0),
+        remark: row.remark?row.remark:''
     });
     pact.save(function (err) {
         if (err) console.log(err);
@@ -90,6 +97,7 @@ router.post('/add', function(req, res) {
 router.post('/save', function(req, res) {
     var row = req.body;
     var pact = {
+            done: row.done?row.done:'нет',
             pact_id: row.pact_id?row.pact_id:0,
             branch: row.branch?row.branch:'',
             partner_id: row.partner_id?row.partner_id:'',
@@ -102,7 +110,8 @@ router.post('/save', function(req, res) {
             validity: row.date?row.date:moment(),
             key: row.key?row.key:'',
             exec: row.exec?row.exec:'',
-            done: row.done?row.done:''
+            scan: row.scan?row.scan:new Buffer(0),
+            remark: row.remark?row.remark:''
         };
     Pact.findByIdAndUpdate(row._id, pact, function(err){
         if(err) console.log(err);

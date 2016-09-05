@@ -5,7 +5,7 @@ block content
 	form.addForm(method='post' action='/rest/add' autocomplete='off')
 		.form-group.ots
 			label(for='pact_id') Номер регистрации
-			input.form-control#pact_id(type='text' name='pact_id' value=next_id)
+			input.form-control#pact_id(type='text' name='pact_id' value=next_id required)
 		.form-group.ots
 			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch')
@@ -54,6 +54,15 @@ block content
 				each el in exes
 					option(value=el)
 		.form-group.ots
-			label(for='done') Примечание
-			input.form-control#done(name='done')
+			label(for='re') Примечание
+			input.form-control#re(name='remark')
+		.form-group.ots
+			label(for='scan') Прикрепить скан
+			input.form-control#scan(name='scan' type='file')
+		.form-group.ots
+			label(for='done') Наличие договора
+			input.form-control#done(list='dns' name='done')
+			datalist#dns
+				option(value='да')
+				option(value='нет')
 		input.form-control.btn-success#addbtn(value='Добавить' type='submit')

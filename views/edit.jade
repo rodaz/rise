@@ -5,8 +5,14 @@ block content
 	form.addForm(method='post' action='/rest/save' autocomplete='off')
 		input(type='hidden' name='_id' value=_i)
 		.form-group.ots
+			label(for='done') Наличие договора
+			input.form-control#done(list='dns' name='done' value=d)
+			datalist#dns
+				option(value='да')
+				option(value='нет')
+		.form-group.ots
 			label(for='pact_id') Номер регистрации
-			input.form-control#pact_id(type='text' name='pact_id' value=pid)
+			input.form-control#pact_id(type='text' name='pact_id' value=pid required)
 		.form-group.ots
 			label(for='branch') Отдел
 			input.form-control#branch(list='branches' name='branch' value=br)
@@ -55,6 +61,17 @@ block content
 				each el in exes
 					option(value=el)
 		.form-group.ots
-			label(for='done') Примечание
-			input.form-control#done(name='done' value=d)
+			label(for='re') Примечание
+			input.form-control#re(name='remark' value=re)
+		if sc
+			.form-group.ots
+				label(for='scan') Заменить скан
+				input.form-control#scan(name='scan' type='file')
+				br
+				button.form-control.btn.btn-info(onclick="window.location.href='/scan.txt'") Просмотреть скан
+		else
+			.form-group.ots
+				label(for='scan') Прикрепить скан
+				input.form-control#scan(name='scan' type='file')
+		
 		input.form-control.btn.btn-success#addbtn(value='Сохранить' type='submit')

@@ -36,6 +36,7 @@ $(document).ready(function(){
 		var content = "<table class='table table-bordered tablesorter' id='root'>";
 		content += '<thead><tr>'+
 			'<th>Ред.</th>'+
+			'<th>Нал.</th>'+
 			'<th>№ рег.</th>'+
 			'<th>Отдел</th>'+
 			'<th>№ контрагента</th>'+
@@ -54,23 +55,42 @@ $(document).ready(function(){
 			content += '<tr>';
 			content += '<td><a href=\'rest/edit/'+data[i]._id+'\'><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>';
 			for (var key in data[i]) {
-				if (key == '_id' || key == '__v') continue;
-				if (key == 'date_close' || key == 'date_reg') {
+				
+				if (key == '_id' || key == '__v' || key == 'scan') 
+					continue;
+				
+				if (key == 'date_close' || key == 'validity') {
 					content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
 					continue;
 				}
-				if (key == 'validity') {
-				    if (moment(data[i][key]) < moment())
+				// if (key == 'validity') {
+				//     if (moment(data[i]['done']) < moment())
+    //                     content += '<td class=\'danger\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+    //                 else if (moment(data[i][key]) < moment().add(2, 'days'))
+    //                 		content += '<td class=\'warning\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+    //                 	else content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+    //                 continue;
+    //             }
+                if (key == 'date_reg') {
+				    if (data[i]['done'] == false && moment() > moment(data[i][key]).add(23, 'days'))
                         content += '<td class=\'danger\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
-                    else if (moment(data[i][key]) < moment().add(2, 'days'))
-                    		content += '<td class=\'warning\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
-                    	else content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+                    else 
+                    	content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
                     continue;
                 }
-                if (key == 'partner') {
-                	content += '<td title=\'Описание контрагента\'>' + data[i][key] + '</td>';
-                	continue;
-                }
+
+                // if (key == 'done') {
+                // 	if (data[i][key] == true)
+                // 		content += '<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>';
+                // 	else
+                // 		content += '<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>';
+                // 	continue;
+                // }
+
+                // if (key == 'partner') {
+                // 	content += '<td title=\'Описание контрагента\'>' + data[i][key] + '</td>';
+                // 	continue;
+                // }
 				content += '<td>' + data[i][key] + '</td>';
 			}
 			content += '</tr>';
