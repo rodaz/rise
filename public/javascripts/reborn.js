@@ -49,6 +49,7 @@ $(document).ready(function(){
 			'<th>Срок действия</th>'+
 			'<th>ЕГРПОУ</th>'+
 			'<th>Отв. исполнитель</th>'+
+			'<th>Скан</th>'+
 			'<th>Примечание</th>'+
 		'</tr></thead><tbody>';
 		for (var i=0; i<data.length; i++) {
@@ -56,11 +57,20 @@ $(document).ready(function(){
 			content += '<td><a href=\'rest/edit/'+data[i]._id+'\'><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>';
 			for (var key in data[i]) {
 				
-				if (key == '_id' || key == '__v' || key == 'scan') 
+				if (key == '_id' || key == '__v') 
 					continue;
 				
 				if (key == 'date_close' || key == 'validity') {
 					content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
+					continue;
+				}
+
+				if (key == 'scan') {
+					if (data[i][key] == '') {
+						content += '<td>нет</td>';
+					} else {
+						content += '<td>да</td>';
+					}
 					continue;
 				}
 				// if (key == 'validity') {
@@ -72,7 +82,7 @@ $(document).ready(function(){
     //                 continue;
     //             }
                 if (key == 'date_reg') {
-				    if (data[i]['done'] == false && moment() > moment(data[i][key]).add(23, 'days'))
+				    if (data[i]['done'] == 'нет' && moment() > moment(data[i][key]).add(23, 'days'))
                         content += '<td class=\'danger\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
                     else 
                     	content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
@@ -99,4 +109,12 @@ $(document).ready(function(){
 		core.empty();
 		core.append(content);
 	}
+
+	// $('#btnScan').on('click', function(event) {
+	// 	event.preventDefault();
+	// 	console.log('btnScan');
+	// 	$.get("/rest/scan", {
+	// 		id : $('#currId').val()
+	// 	});
+	// });
 });

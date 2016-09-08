@@ -3,6 +3,18 @@ var router = express.Router();
 var Pact = require('../models/pact');
 var moment = require('moment');
 var fs = require('fs');
+var multer = require('multer');
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/images/'+req.body.branch)
+    },
+    filename: function (req, file, cb) {
+        cb(null, req.body.pact_id+'_'+req.body.partner)
+    }
+});
+// var upload = multer({ dest : 'public/images/' });
+var upload = multer({storage:storage});
+var path = require('path');
 
 router.get('/add', function(req, res) {
     var deps=[], parts=[], exes=[], ids=[];
@@ -40,7 +52,6 @@ router.get('/edit/:id', function(req, res) {
 
             Pact.findOne({_id: req.params.id}, function(err, fp) {
                 if (err) return console.log(err);
-                fs.writeFileSync('scan.txt', fp.scan);
                 res.render('edit', {
                     _i: fp._id,
                     d: fp.done,
@@ -56,8 +67,7 @@ router.get('/edit/:id', function(req, res) {
                     da: moment(fp.date).format('YYYY-MM-DD'),
                     ke: fp.key,
                     ex: fp.exec,
-                    re: fp.remark,
-                    sc: fp.scan.length>1,
+                    rm: fp.remark,
                     scan: fp.scan,
                     deps: unique(deps),
                     parts: unique(parts),
@@ -69,7 +79,7 @@ router.get('/edit/:id', function(req, res) {
 
 });
 
-router.post('/add', function(req, res) {
+router.post('/add', upload.single('scan'), function(req, res) {
     var row = req.body;
     var pact = new Pact({
         done: row.done?row.done:'нет',
@@ -85,7 +95,7 @@ router.post('/add', function(req, res) {
         validity: row.date?row.date:moment(),
         key: row.key?row.key:'',
         exec: row.exec?row.exec:'',
-        scan: row.scan?row.scan:new Buffer(0),
+        scan: req.file?req.file.path:'',
         remark: row.remark?row.remark:''
     });
     pact.save(function (err) {
@@ -94,9 +104,12 @@ router.post('/add', function(req, res) {
     res.redirect('/');
 });
 
-router.post('/save', function(req, res) {
+router.post('/save', upload.single('scan'), function(req, res) {
     var row = req.body;
-    var pact = {
+    var pact;
+    console.log(req.file);
+    if (req.file) {
+        pact = {
             done: row.done?row.done:'нет',
             pact_id: row.pact_id?row.pact_id:0,
             branch: row.branch?row.branch:'',
@@ -110,9 +123,27 @@ router.post('/save', function(req, res) {
             validity: row.date?row.date:moment(),
             key: row.key?row.key:'',
             exec: row.exec?row.exec:'',
-            scan: row.scan?row.scan:new Buffer(0),
+            scan: req.file?req.file.path:'',
             remark: row.remark?row.remark:''
         };
+    } else {
+        pact = {
+            done: row.done?row.done:'нет',
+            pact_id: row.pact_id?row.pact_id:0,
+            branch: row.branch?row.branch:'',
+            partner_id: row.partner_id?row.partner_id:'',
+            date_reg: row.reg?row.reg:moment(),
+            date_close: row.close?row.close:moment(),
+            partner: row.partner?row.partner:'',
+            subject: row.theme?row.theme:'',
+            amount: row.amount?row.amount:'',
+            currency: row.curr?row.curr:'',
+            validity: row.date?row.date:moment(),
+            key: row.key?row.key:'',
+            exec: row.exec?row.exec:'',
+            remark: row.remark?row.remark:''
+        };
+    }
     Pact.findByIdAndUpdate(row._id, pact, function(err){
         if(err) console.log(err);
     });
@@ -135,6 +166,17 @@ router.post('/search', function(req, res) {
         res.send(search_data);
     });
 });
+
+// router.get('/scan', function(req, res) {
+//     console.log(req.body.id);
+//     Pact.findOne({_id: req.query.id}, function(err, fp) {
+//         if (err) return console.log(err);
+//         console.log(fp.scan);
+//         res.download(path.resolve('./'+fp.scan), function(err){
+//             if (err) {console.log(err);}
+//         });
+//     });
+// });
 
 function unique(arr) {
   var obj = {};

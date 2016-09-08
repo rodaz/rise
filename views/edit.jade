@@ -2,8 +2,8 @@ extends layouth
 
 block content
 	.h1.text-center Редактирование договора
-	form.addForm(method='post' action='/rest/save' autocomplete='off')
-		input(type='hidden' name='_id' value=_i)
+	form.addForm(method='post' action='/rest/save' autocomplete='off' enctype='multipart/form-data')
+		input(id='currId' type='hidden' name='_id' value=_i)
 		.form-group.ots
 			label(for='done') Наличие договора
 			input.form-control#done(list='dns' name='done' value=d)
@@ -61,14 +61,14 @@ block content
 				each el in exes
 					option(value=el)
 		.form-group.ots
-			label(for='re') Примечание
-			input.form-control#re(name='remark' value=re)
-		if sc
+			label(for='rm') Примечание
+			input.form-control#rm(name='remark' value=rm)
+		if scan
 			.form-group.ots
 				label(for='scan') Заменить скан
 				input.form-control#scan(name='scan' type='file')
 				br
-				button.form-control.btn.btn-info(onclick="window.location.href='/scan.txt'") Просмотреть скан
+				a.form-control.btn.btn-info(href='/'+scan) Просмотреть скан
 		else
 			.form-group.ots
 				label(for='scan') Прикрепить скан

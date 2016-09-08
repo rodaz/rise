@@ -14,7 +14,7 @@ var pactSchema = mongoose.Schema({
 	validity: Date,
 	key: String,
 	exec: String,
-	scan: Buffer,
+	scan: String,
 	remark: String
 });
 
