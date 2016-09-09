@@ -11,31 +11,8 @@ var isAuthenticated = function (req, res, next){
 module.exports = function(passport) {
 
 	/* GET login page. */
-	// router.get('/', function(req, res) {
-	// 	res.render('index', { title: 'Express' });
-	// });
 	router.get('/', function(req, res) {
-		var deps=[], yes=[], parts=[], exes=[];
-		Pact.find(function(err, pacts){
-			if(err) console.log(err)
-			else {
-				pacts.forEach(function(val) {
-					deps.push(val.branch);
-					yes.push(val.date_reg.getFullYear());
-					parts.push(val.partner);
-					exes.push(val.exec);
-				});
-
-				res.render('home', { 
-					title: 'Журнал договоров', 
-					deps: unique(deps),
-					yes: unique(yes),
-					parts: unique(parts),
-					exes: unique(exes)
-				});
-			}
-		});
-		
+		res.render('index');
 	});
 
 	/* Handle login post */
@@ -58,7 +35,26 @@ module.exports = function(passport) {
 
 	/* GET Home Page */
 	router.get('/home', isAuthenticated, function(req, res){
-		res.render('home', { user: req.user });
+		var deps=[], yes=[], parts=[], exes=[];
+		Pact.find(function(err, pacts){
+			if(err) console.log(err)
+			else {
+				pacts.forEach(function(val) {
+					deps.push(val.branch);
+					yes.push(val.date_reg.getFullYear());
+					parts.push(val.partner);
+					exes.push(val.exec);
+				});
+
+				res.render('home', {
+					user: req.user,  
+					deps: unique(deps),
+					yes: unique(yes),
+					parts: unique(parts),
+					exes: unique(exes)
+				});
+			}
+		});
 	});
 
 	/* Handle Logout */
@@ -67,6 +63,9 @@ module.exports = function(passport) {
 		res.redirect('/');
 	});
 
+	/**
+	*	List->Set
+	*/
 	function unique(arr) {
 	  var obj = {};
 

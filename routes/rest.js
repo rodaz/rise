@@ -6,18 +6,21 @@ var fs = require('fs');
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'public/images/'+req.body.branch)
+        cb(null, 'public/images/'+moment(req.body.date_reg).year())
     },
     filename: function (req, file, cb) {
-        cb(null, req.body.pact_id+'_'+req.body.partner)
+        cb(null, req.body.pact_id+'_'+req.body.date_reg+'.pdf')
     }
 });
-// var upload = multer({ dest : 'public/images/' });
 var upload = multer({storage:storage});
 var path = require('path');
 
 router.get('/add', function(req, res) {
-    var deps=[], parts=[], exes=[], ids=[];
+    var deps=[], 
+        parts=[],
+        exes=[],
+        ids=[];
+
     Pact.find(function(err, pacts) {
         if (err) console.log(err)
         else {
@@ -40,7 +43,10 @@ router.get('/add', function(req, res) {
 });
 
 router.get('/edit/:id', function(req, res) {
-    var deps=[], parts=[], exes=[];
+    var deps=[],
+        parts=[],
+        exes=[];
+    
     Pact.find(function(err, pacts) {
         if (err) console.log(err)
         else {
@@ -76,7 +82,6 @@ router.get('/edit/:id', function(req, res) {
             });
         }
     });
-
 });
 
 router.post('/add', upload.single('scan'), function(req, res) {
@@ -98,16 +103,17 @@ router.post('/add', upload.single('scan'), function(req, res) {
         scan: req.file?req.file.path:'',
         remark: row.remark?row.remark:''
     });
+
     pact.save(function (err) {
         if (err) console.log(err);
     });
-    res.redirect('/');
+
+    res.redirect('/home');
 });
 
 router.post('/save', upload.single('scan'), function(req, res) {
     var row = req.body;
     var pact;
-    console.log(req.file);
     if (req.file) {
         pact = {
             done: row.done?row.done:'нет',
@@ -144,10 +150,12 @@ router.post('/save', upload.single('scan'), function(req, res) {
             remark: row.remark?row.remark:''
         };
     }
+
     Pact.findByIdAndUpdate(row._id, pact, function(err){
         if(err) console.log(err);
     });
-    res.redirect('/');
+
+    res.redirect('/home');
 });
 
 router.post('/search', function(req, res) {
@@ -161,23 +169,16 @@ router.post('/search', function(req, res) {
     if (req.body.partner) params.partner = req.body.partner;
     if (req.body.exec) params.exec = req.body.exec;
     if (req.body.done) params.done = req.body.done;
+    
     Pact.find(params, function(err, search_data) {
         if(err) console.log(err);
         res.send(search_data);
     });
 });
 
-// router.get('/scan', function(req, res) {
-//     console.log(req.body.id);
-//     Pact.findOne({_id: req.query.id}, function(err, fp) {
-//         if (err) return console.log(err);
-//         console.log(fp.scan);
-//         res.download(path.resolve('./'+fp.scan), function(err){
-//             if (err) {console.log(err);}
-//         });
-//     });
-// });
-
+/**
+*   List->Set
+*/
 function unique(arr) {
   var obj = {};
 

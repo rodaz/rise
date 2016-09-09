@@ -1,5 +1,13 @@
 $(document).ready(function(){
+
+	//configurable variables
+	var DAYS_BEFORE_BACKLIGHT = 23;
+
+	/**
+	*	Search recording with specified fields
+	*/
 	$('#search').on('click', function() {
+		
 		$.post("/rest/search", {
 			year: $('#year').val(),
 			branch: $('#branch').val(),
@@ -7,33 +15,30 @@ $(document).ready(function(){
 			exec: $('#exec').val(),
 			done: $('#done').val()
 		}, function (data) {
+			
 			create(data);
+
+			//Options for tablesorter plugin
 			$('#root').tablesorter({
 				dateFormat: "ddmmyyyy",
 				theme : "bootstrap",
-
 			    widthFixed: true,
-
 			    headerTemplate : '{content} {icon}', 
-
-			    // widget code contained in the jquery.tablesorter.widgets.js file
-			    // use the zebra stripe widget if you plan on hiding any rows (filter widget)
 			    widgets : [ "uitheme", "filter"],
-
 			    widgetOptions : {
-			      // reset filters button
 			      filter_hideFilters: true,
-
-			      // extra css class name (string or array) added to the filter element (input or select)
 			      filter_cssFilter: "form-control"
 			  	}
 			});
 		});
 	});
-
+	/**
+	*	Create a main table with data
+	*/
 	function create(data) {
         var core = $('#core');
 		var content = "<table class='table table-bordered tablesorter' id='root'>";
+		
 		content += '<thead><tr>'+
 			'<th>Ред.</th>'+
 			'<th>Нал.</th>'+
@@ -52,14 +57,17 @@ $(document).ready(function(){
 			'<th>Скан</th>'+
 			'<th>Примечание</th>'+
 		'</tr></thead><tbody>';
+
 		for (var i=0; i<data.length; i++) {
 			content += '<tr>';
 			content += '<td><a href=\'rest/edit/'+data[i]._id+'\'><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>';
 			for (var key in data[i]) {
 				
+				//hidden fields
 				if (key == '_id' || key == '__v') 
 					continue;
 				
+				//set date format
 				if (key == 'date_close' || key == 'validity') {
 					content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
 					continue;
@@ -73,48 +81,24 @@ $(document).ready(function(){
 					}
 					continue;
 				}
-				// if (key == 'validity') {
-				//     if (moment(data[i]['done']) < moment())
-    //                     content += '<td class=\'danger\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
-    //                 else if (moment(data[i][key]) < moment().add(2, 'days'))
-    //                 		content += '<td class=\'warning\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
-    //                 	else content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
-    //                 continue;
-    //             }
+
+				//backlight after n days if done = false
                 if (key == 'date_reg') {
-				    if (data[i]['done'] == 'нет' && moment() > moment(data[i][key]).add(23, 'days'))
+				    if (data[i]['done'] == 'нет' && moment() > moment(data[i][key]).add(DAYS_BEFORE_BACKLIGHT, 'days'))
                         content += '<td class=\'danger\'>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
                     else 
                     	content += '<td>' + moment(data[i][key]).format('DD.MM.YYYY') + '</td>';
                     continue;
                 }
 
-                // if (key == 'done') {
-                // 	if (data[i][key] == true)
-                // 		content += '<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>';
-                // 	else
-                // 		content += '<td><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></td>';
-                // 	continue;
-                // }
-
-                // if (key == 'partner') {
-                // 	content += '<td title=\'Описание контрагента\'>' + data[i][key] + '</td>';
-                // 	continue;
-                // }
 				content += '<td>' + data[i][key] + '</td>';
 			}
+
 			content += '</tr>';
 		}
+
 		content += "</tbody></table>";
 		core.empty();
 		core.append(content);
 	}
-
-	// $('#btnScan').on('click', function(event) {
-	// 	event.preventDefault();
-	// 	console.log('btnScan');
-	// 	$.get("/rest/scan", {
-	// 		id : $('#currId').val()
-	// 	});
-	// });
 });

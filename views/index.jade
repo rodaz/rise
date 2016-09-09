@@ -1,11 +1,29 @@
 extends layout
 
 block content
-	#login-form
-		h1 Авторизация
-		fieldset
-			form(action='/login', method='POST')
-				input(type='text', name='username', placeholder='Логин', required, autofocus)
-				input(type='password', name='password', placeholder='Пароль', required)
-				input(type='submit' value='ВОЙТИ')
-			a(href='/signup', class='text-center new-account') Create an account
+  div.container
+    div.row
+      div.col-sm-6.col-md-4.col-md-offset-4
+        div.panel.panel-default
+          div.panel-heading
+            strong Авторизация
+          div.panel-body
+            form(class='form-signin', role='form', action='/login', method='POST')
+              fildset
+                div.row
+                  div.center-block
+                    img(class='img-rounded center-block', src='public/images/auth.png')
+                div.row
+                  div.col-sm-12.col-md-10.col-md-offset-1
+                    div.form-group
+                      div.input-group
+                        span.input-group-addon
+                        input(type='text', name='username' class='form-control', placeholder='Логин',required, autofocus)
+                    div.form-group
+                      div.input-group
+                        span.input-group-addon
+                        input(type='password', name='password' class='form-control', placeholder='Пароль', required)
+                    div.input-group
+                      input(class='btn btn-lg btn-primary btn-block', type='submit', value="Войти")
+          div.panel-footer
+            a(href='/signup') Создать учетную запись

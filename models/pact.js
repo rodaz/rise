@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 
+/**
+*	Main model. One row in table - one object
+*/
 var pactSchema = mongoose.Schema({
 	done: String,
 	pact_id: Number,
