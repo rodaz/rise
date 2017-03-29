@@ -8,7 +8,7 @@
 	}
 }(function(jQuery) {
 
-/*! TableSorter (FORK) v2.27.5 *//*
+/*! TableSorter (FORK) v2.28.5 *//*
 * Client-side table sorting with ease!
 * @requires jQuery v1.2.6+
 *
@@ -32,7 +32,7 @@
 	'use strict';
 	var ts = $.tablesorter = {
 
-		version : '2.27.5',
+		version : '2.28.5',
 
 		parsers : [],
 		widgets : [],
@@ -84,7 +84,7 @@
 			widgetClass      : 'widget-{name}', // table class name template to match to include a widget
 			widgets          : [],         // method to add widgets, e.g. widgets: ['zebra']
 			widgetOptions    : {
-				zebra : [ 'even', 'odd' ]    // zebra widget alternating row class names
+				zebra : [ 'even', 'odd' ]  // zebra widget alternating row class names
 			},
 
 			// *** callbacks
@@ -101,8 +101,8 @@
 
 			cssChildRow      : 'tablesorter-childRow', // class name indiciating that a row is to be attached to its parent
 			cssInfoBlock     : 'tablesorter-infoOnly', // don't sort tbody with this class name (only one class name allowed here!)
-			cssNoSort        : 'tablesorter-noSort',      // class name added to element inside header; clicking on it won't cause a sort
-			cssIgnoreRow     : 'tablesorter-ignoreRow',   // header row to ignore; cells within this row will not be added to c.$headers
+			cssNoSort        : 'tablesorter-noSort',   // class name added to element inside header; clicking on it won't cause a sort
+			cssIgnoreRow     : 'tablesorter-ignoreRow',// header row to ignore; cells within this row will not be added to c.$headers
 
 			cssIcon          : 'tablesorter-icon', // if this class does not exist, the {icon} will not be added from the headerTemplate
 			cssIconNone      : '', // class name added to the icon when there is no column sort
@@ -116,7 +116,7 @@
 
 			// *** selectors
 			selectorHeaders  : '> thead th, > thead td',
-			selectorSort     : 'th, td',   // jQuery selector of content within selectorHeaders that is clickable to trigger a sort
+			selectorSort     : 'th, td', // jQuery selector of content within selectorHeaders that is clickable to trigger a sort
 			selectorRemove   : '.remove-me',
 
 			// *** advanced
@@ -126,7 +126,11 @@
 			headerList: [],
 			empties: {},
 			strings: {},
-			parsers: []
+			parsers: [],
+
+			// *** parser options for validator; values must be falsy!
+			globalize: 0,
+			imgAttr: 0
 
 			// removed: widgetZebra: { css: ['even', 'odd'] }
 
@@ -243,7 +247,7 @@
 			// save the settings where they read
 			$.data( table, 'tablesorter', c );
 			if ( c.debug ) {
-				console[ console.group ? 'group' : 'log' ]( 'Initializing tablesorter' );
+				console[ console.group ? 'group' : 'log' ]( 'Initializing tablesorter v' + ts.version );
 				$.data( table, 'startoveralltimer', new Date() );
 			}
 
@@ -300,6 +304,7 @@
 			ts.setupParsers( c );
 			// start total row count at zero
 			c.totalRows = 0;
+			ts.validateOptions( c );
 			// build the cache for the tbody cells
 			// delayInit will delay building the cache until the user starts a sort
 			if ( !c.delayInit ) { ts.buildCache( c ); }
@@ -345,7 +350,7 @@
 			table.hasInitialized = true;
 			table.isProcessing = false;
 			if ( c.debug ) {
-				console.log( 'Overall initialization time: ' + ts.benchmark( $.data( table, 'startoveralltimer' ) ) );
+				console.log( 'Overall initialization time:' + ts.benchmark( $.data( table, 'startoveralltimer' ) ) );
 				if ( c.debug && console.groupEnd ) { console.groupEnd(); }
 			}
 			$table.triggerHandler( 'tablesorter-initialized', table );
@@ -433,9 +438,11 @@
 				e.stopPropagation();
 				// remove all widgets
 				ts.removeWidget( this, true, false );
+				var tmp = $.extend( true, {}, c.originalSettings );
 				// restore original settings; this clears out current settings, but does not clear
 				// values saved to storage.
-				c = $.extend( true, ts.defaults, c.originalSettings );
+				c = $.extend( true, ts.defaults, tmp );
+				c.originalSettings = tmp;
 				this.hasInitialized = false;
 				// setup the entire table again
 				ts.setup( this, c );
@@ -1078,6 +1085,7 @@
 					.removeClass( css.join( ' ' ) );
 			// remove all header information
 			c.$headers
+				.add( $( 'thead ' + c.namespace + '_extra_headers' ) )
 				.removeClass( css.join( ' ' ) )
 				.addClass( none )
 				.attr( 'aria-sort', 'none' )
@@ -1631,8 +1639,9 @@
 
 		// sort multiple columns
 		multisort : function( c ) { /*jshint loopfunc:true */
-			var tbodyIndex, sortTime, colMax, rows,
+			var tbodyIndex, sortTime, colMax, rows, tmp,
 				table = c.table,
+				sorter = [],
 				dir = 0,
 				textSorter = c.textSorter || '',
 				sortList = c.sortList,
@@ -1643,6 +1652,16 @@
 				return;
 			}
 			if ( c.debug ) { sortTime = new Date(); }
+			// cache textSorter to optimize speed
+			if ( typeof textSorter === 'object' ) {
+				colMax = c.columns;
+				while ( colMax-- ) {
+					tmp = ts.getColumnData( table, textSorter, colMax );
+					if ( typeof tmp === 'function' ) {
+						sorter[ colMax ] = tmp;
+					}
+				}
+			}
 			for ( tbodyIndex = 0; tbodyIndex < len; tbodyIndex++ ) {
 				colMax = c.cache[ tbodyIndex ].colMax;
 				rows = c.cache[ tbodyIndex ].normalized;
@@ -1681,9 +1700,9 @@
 							if ( typeof textSorter === 'function' ) {
 								// custom OVERALL text sorter
 								sort = textSorter( x[ col ], y[ col ], dir, col, table );
-							} else if ( typeof textSorter === 'object' && textSorter.hasOwnProperty( col ) ) {
+							} else if ( typeof sorter[ col ] === 'function' ) {
 								// custom text sorter for a SPECIFIC COLUMN
-								sort = textSorter[ col ]( x[ col ], y[ col ], dir, col, table );
+								sort = sorter[ col ]( x[ col ], y[ col ], dir, col, table );
 							} else {
 								// fall back to natural sort
 								sort = ts[ 'sortNatural' + ( dir ? 'Asc' : 'Desc' ) ]( a[ col ], b[ col ], col, c );
@@ -1909,6 +1928,8 @@
 					widget = ts.getWidgetById( c.widgets[ indx ] );
 					if ( widget && widget.options ) {
 						c.widgetOptions = $.extend( true, {}, widget.options, c.widgetOptions );
+						// add widgetOptions to defaults for option validator
+						$.extend( true, ts.defaults.widgetOptions, widget.options );
 					}
 				}
 			}
@@ -2281,7 +2302,9 @@
 		},
 
 		getColumnData : function( table, obj, indx, getCell, $headers ) {
-			if ( typeof obj === 'undefined' || obj === null ) { return; }
+			if ( typeof obj !== 'object' || obj === null ) {
+				return obj;
+			}
 			table = $( table )[ 0 ];
 			var $header, key,
 				c = table.config,
@@ -2390,6 +2413,34 @@
 				}
 			}
 			return str;
+		},
+
+		validateOptions : function( c ) {
+			var setting, setting2, typ, timer,
+				// ignore options containing an array
+				ignore = 'headers sortForce sortList sortAppend widgets'.split( ' ' ),
+				orig = c.originalSettings;
+			if ( orig ) {
+				if ( c.debug ) {
+					timer = new Date();
+				}
+				for ( setting in orig ) {
+					typ = typeof ts.defaults[setting];
+					if ( typ === 'undefined' ) {
+						console.warn( 'Tablesorter Warning! "table.config.' + setting + '" option not recognized' );
+					} else if ( typ === 'object' ) {
+						for ( setting2 in orig[setting] ) {
+							typ = ts.defaults[setting] && typeof ts.defaults[setting][setting2];
+							if ( $.inArray( setting, ignore ) < 0 && typ === 'undefined' ) {
+								console.warn( 'Tablesorter Warning! "table.config.' + setting + '.' + setting2 + '" option not recognized' );
+							}
+						}
+					}
+				}
+				if ( c.debug ) {
+					console.log( 'validate options time:' + ts.benchmark( timer ) );
+				}
+			}
 		},
 
 		// restore headers

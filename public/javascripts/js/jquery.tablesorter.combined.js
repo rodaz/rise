@@ -1,4 +1,4 @@
-/*! tablesorter (FORK) - updated 08-22-2016 (v2.27.5)*/
+/*! tablesorter (FORK) - updated 01-28-2017 (v2.28.5)*/
 /* Includes widgets ( storage,uitheme,columns,filter,stickyHeaders,resizable,saveSort ) */
 (function(factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -10,7 +10,7 @@
 	}
 }(function(jQuery) {
 
-/*! TableSorter (FORK) v2.27.5 *//*
+/*! TableSorter (FORK) v2.28.5 *//*
 * Client-side table sorting with ease!
 * @requires jQuery v1.2.6+
 *
@@ -34,7 +34,7 @@
 	'use strict';
 	var ts = $.tablesorter = {
 
-		version : '2.27.5',
+		version : '2.28.5',
 
 		parsers : [],
 		widgets : [],
@@ -86,7 +86,7 @@
 			widgetClass      : 'widget-{name}', // table class name template to match to include a widget
 			widgets          : [],         // method to add widgets, e.g. widgets: ['zebra']
 			widgetOptions    : {
-				zebra : [ 'even', 'odd' ]    // zebra widget alternating row class names
+				zebra : [ 'even', 'odd' ]  // zebra widget alternating row class names
 			},
 
 			// *** callbacks
@@ -103,8 +103,8 @@
 
 			cssChildRow      : 'tablesorter-childRow', // class name indiciating that a row is to be attached to its parent
 			cssInfoBlock     : 'tablesorter-infoOnly', // don't sort tbody with this class name (only one class name allowed here!)
-			cssNoSort        : 'tablesorter-noSort',      // class name added to element inside header; clicking on it won't cause a sort
-			cssIgnoreRow     : 'tablesorter-ignoreRow',   // header row to ignore; cells within this row will not be added to c.$headers
+			cssNoSort        : 'tablesorter-noSort',   // class name added to element inside header; clicking on it won't cause a sort
+			cssIgnoreRow     : 'tablesorter-ignoreRow',// header row to ignore; cells within this row will not be added to c.$headers
 
 			cssIcon          : 'tablesorter-icon', // if this class does not exist, the {icon} will not be added from the headerTemplate
 			cssIconNone      : '', // class name added to the icon when there is no column sort
@@ -118,7 +118,7 @@
 
 			// *** selectors
 			selectorHeaders  : '> thead th, > thead td',
-			selectorSort     : 'th, td',   // jQuery selector of content within selectorHeaders that is clickable to trigger a sort
+			selectorSort     : 'th, td', // jQuery selector of content within selectorHeaders that is clickable to trigger a sort
 			selectorRemove   : '.remove-me',
 
 			// *** advanced
@@ -128,7 +128,11 @@
 			headerList: [],
 			empties: {},
 			strings: {},
-			parsers: []
+			parsers: [],
+
+			// *** parser options for validator; values must be falsy!
+			globalize: 0,
+			imgAttr: 0
 
 			// removed: widgetZebra: { css: ['even', 'odd'] }
 
@@ -245,7 +249,7 @@
 			// save the settings where they read
 			$.data( table, 'tablesorter', c );
 			if ( c.debug ) {
-				console[ console.group ? 'group' : 'log' ]( 'Initializing tablesorter' );
+				console[ console.group ? 'group' : 'log' ]( 'Initializing tablesorter v' + ts.version );
 				$.data( table, 'startoveralltimer', new Date() );
 			}
 
@@ -302,6 +306,7 @@
 			ts.setupParsers( c );
 			// start total row count at zero
 			c.totalRows = 0;
+			ts.validateOptions( c );
 			// build the cache for the tbody cells
 			// delayInit will delay building the cache until the user starts a sort
 			if ( !c.delayInit ) { ts.buildCache( c ); }
@@ -347,7 +352,7 @@
 			table.hasInitialized = true;
 			table.isProcessing = false;
 			if ( c.debug ) {
-				console.log( 'Overall initialization time: ' + ts.benchmark( $.data( table, 'startoveralltimer' ) ) );
+				console.log( 'Overall initialization time:' + ts.benchmark( $.data( table, 'startoveralltimer' ) ) );
 				if ( c.debug && console.groupEnd ) { console.groupEnd(); }
 			}
 			$table.triggerHandler( 'tablesorter-initialized', table );
@@ -435,9 +440,11 @@
 				e.stopPropagation();
 				// remove all widgets
 				ts.removeWidget( this, true, false );
+				var tmp = $.extend( true, {}, c.originalSettings );
 				// restore original settings; this clears out current settings, but does not clear
 				// values saved to storage.
-				c = $.extend( true, ts.defaults, c.originalSettings );
+				c = $.extend( true, ts.defaults, tmp );
+				c.originalSettings = tmp;
 				this.hasInitialized = false;
 				// setup the entire table again
 				ts.setup( this, c );
@@ -1080,6 +1087,7 @@
 					.removeClass( css.join( ' ' ) );
 			// remove all header information
 			c.$headers
+				.add( $( 'thead ' + c.namespace + '_extra_headers' ) )
 				.removeClass( css.join( ' ' ) )
 				.addClass( none )
 				.attr( 'aria-sort', 'none' )
@@ -1633,8 +1641,9 @@
 
 		// sort multiple columns
 		multisort : function( c ) { /*jshint loopfunc:true */
-			var tbodyIndex, sortTime, colMax, rows,
+			var tbodyIndex, sortTime, colMax, rows, tmp,
 				table = c.table,
+				sorter = [],
 				dir = 0,
 				textSorter = c.textSorter || '',
 				sortList = c.sortList,
@@ -1645,6 +1654,16 @@
 				return;
 			}
 			if ( c.debug ) { sortTime = new Date(); }
+			// cache textSorter to optimize speed
+			if ( typeof textSorter === 'object' ) {
+				colMax = c.columns;
+				while ( colMax-- ) {
+					tmp = ts.getColumnData( table, textSorter, colMax );
+					if ( typeof tmp === 'function' ) {
+						sorter[ colMax ] = tmp;
+					}
+				}
+			}
 			for ( tbodyIndex = 0; tbodyIndex < len; tbodyIndex++ ) {
 				colMax = c.cache[ tbodyIndex ].colMax;
 				rows = c.cache[ tbodyIndex ].normalized;
@@ -1683,9 +1702,9 @@
 							if ( typeof textSorter === 'function' ) {
 								// custom OVERALL text sorter
 								sort = textSorter( x[ col ], y[ col ], dir, col, table );
-							} else if ( typeof textSorter === 'object' && textSorter.hasOwnProperty( col ) ) {
+							} else if ( typeof sorter[ col ] === 'function' ) {
 								// custom text sorter for a SPECIFIC COLUMN
-								sort = textSorter[ col ]( x[ col ], y[ col ], dir, col, table );
+								sort = sorter[ col ]( x[ col ], y[ col ], dir, col, table );
 							} else {
 								// fall back to natural sort
 								sort = ts[ 'sortNatural' + ( dir ? 'Asc' : 'Desc' ) ]( a[ col ], b[ col ], col, c );
@@ -1911,6 +1930,8 @@
 					widget = ts.getWidgetById( c.widgets[ indx ] );
 					if ( widget && widget.options ) {
 						c.widgetOptions = $.extend( true, {}, widget.options, c.widgetOptions );
+						// add widgetOptions to defaults for option validator
+						$.extend( true, ts.defaults.widgetOptions, widget.options );
 					}
 				}
 			}
@@ -2283,7 +2304,9 @@
 		},
 
 		getColumnData : function( table, obj, indx, getCell, $headers ) {
-			if ( typeof obj === 'undefined' || obj === null ) { return; }
+			if ( typeof obj !== 'object' || obj === null ) {
+				return obj;
+			}
 			table = $( table )[ 0 ];
 			var $header, key,
 				c = table.config,
@@ -2392,6 +2415,34 @@
 				}
 			}
 			return str;
+		},
+
+		validateOptions : function( c ) {
+			var setting, setting2, typ, timer,
+				// ignore options containing an array
+				ignore = 'headers sortForce sortList sortAppend widgets'.split( ' ' ),
+				orig = c.originalSettings;
+			if ( orig ) {
+				if ( c.debug ) {
+					timer = new Date();
+				}
+				for ( setting in orig ) {
+					typ = typeof ts.defaults[setting];
+					if ( typ === 'undefined' ) {
+						console.warn( 'Tablesorter Warning! "table.config.' + setting + '" option not recognized' );
+					} else if ( typ === 'object' ) {
+						for ( setting2 in orig[setting] ) {
+							typ = ts.defaults[setting] && typeof ts.defaults[setting][setting2];
+							if ( $.inArray( setting, ignore ) < 0 && typ === 'undefined' ) {
+								console.warn( 'Tablesorter Warning! "table.config.' + setting + '.' + setting2 + '" option not recognized' );
+							}
+						}
+					}
+				}
+				if ( c.debug ) {
+					console.log( 'validate options time:' + ts.benchmark( timer ) );
+				}
+			}
 		},
 
 		// restore headers
@@ -2754,7 +2805,7 @@
 
 })( jQuery );
 
-/*! Widget: storage - updated 3/1/2016 (v2.25.5) */
+/*! Widget: storage - updated 11/26/2016 (v2.28.0) */
 /*global JSON:false */
 ;(function ($, window, document) {
 	'use strict';
@@ -2799,6 +2850,17 @@
 			url = options && options.url ||
 				$table.attr(options && options.page || wo && wo.storage_page || 'data-table-page') ||
 				wo && wo.storage_fixedUrl || c && c.fixedUrl || window.location.pathname;
+		// update defaults for validator; these values must be falsy!
+		$.extend(true, ts.defaults, {
+			fixedUrl: '',
+			widgetOptions: {
+				storage_fixedUrl: '',
+				storage_group: '',
+				storage_page: '',
+				storage_tableId: '',
+				storage_useSessionStorage: ''
+			}
+		});
 		// https://gist.github.com/paulirish/5558557
 		if (storageType in window) {
 			try {
@@ -2845,7 +2907,7 @@
 
 })(jQuery, window, document);
 
-/*! Widget: uitheme - updated 7/31/2016 (v2.27.0) */
+/*! Widget: uitheme - updated 12/8/2016 (v2.28.1) */
 ;(function ($) {
 	'use strict';
 	var ts = $.tablesorter || {};
@@ -2971,7 +3033,7 @@
 						.addClass(themes.icons || '');
 				}
 				// filter widget initializes after uitheme
-				if (c.widgets.indexOf('filter') > -1) {
+				if (ts.hasWidget( c.table, 'filter' )) {
 					tmp = function() {
 						$table.children('thead').children('.' + ts.css.filterRow)
 							.removeClass(hasOldTheme ? oldtheme.filterRow || '' : '')
@@ -3120,7 +3182,7 @@
 
 })(jQuery);
 
-/*! Widget: filter - updated 8/22/2016 (v2.27.5) *//*
+/*! Widget: filter - updated 12/8/2016 (v2.28.1) *//*
  * Requires tablesorter v2.8+ and jQuery 1.7+
  * by Rob Garrison
  */
@@ -3944,18 +4006,29 @@
 					return;
 				}
 				// change event = no delay; last true flag tells getFilters to skip newest timed input
-				tsf.searching( table, true, true );
+				tsf.searching( table, true, true, column );
 			})
 			// include change for select - fixes #473
 			.bind( 'search change keypress input '.split( ' ' ).join( namespace + ' ' ), function( event ) {
 				// don't get cached data, in case data-column changes dynamically
-				var column = parseInt( $( this ).attr( 'data-column' ), 10 );
-				// don't allow 'change' event to process if the input value is the same - fixes #685
+				var column = parseInt( $( this ).attr( 'data-column' ), 10 ),
+					liveSearch = typeof wo.filter_liveSearch === 'boolean' ?
+						wo.filter_liveSearch :
+						ts.getColumnData( table, wo.filter_liveSearch, column );
 				if ( table.config.widgetOptions.filter_initialized &&
-					( event.which === tskeyCodes.enter || event.type === 'search' ||
-					( event.type === 'change' ) && this.value !== c.lastSearch[column] ) ||
-					// only "input" event fires in MS Edge when clicking the "x" to clear the search
-					( event.type === 'input' && this.value === '' ) ) {
+					// immediate search if user presses enter
+					( event.which === tskeyCodes.enter ||
+						// immediate search if a "search" is triggered on the input
+						event.type === 'search' ||
+						// change & input events must be ignored if liveSearch !== true
+						( event.type === 'change' || event.type === 'input' ) &&
+						// prevent search if liveSearch is a number
+						liveSearch === true &&
+						// don't allow 'change' or 'input' event to process if the input value
+						// is the same - fixes #685
+						this.value !== c.lastSearch[column]
+					)
+				) {
 					event.preventDefault();
 					// init search with no delay
 					$( this ).attr( 'data-lastSearchTime', new Date().getTime() );
@@ -3974,7 +4047,7 @@
 					wo.filter_liveSearch :
 					// get column setting, or set to fallback value, or default to false
 					ts.getColumnData( table, wo.filter_liveSearch, column );
-				if ( typeof liveSearch !== 'undefined' ) {
+				if ( typeof liveSearch === 'undefined' ) {
 					liveSearch = wo.filter_liveSearch.fallback || false;
 				}
 			}
@@ -4670,6 +4743,7 @@
 			var cts, txt, indx, len, parsedTxt, str,
 				c = table.config,
 				validColumn = typeof column !== 'undefined' && column !== null && column >= 0 && column < c.columns,
+				direction = validColumn ? c.$headerIndexed[ column ].hasClass( 'filter-select-sort-desc' ) : false,
 				parsed = [];
 			// get unique elements and sort the list
 			// if $.tablesorter.sortText exists ( not in the original tablesorter ),
@@ -4710,8 +4784,8 @@
 				// sort parsed select options
 				cts = c.textSorter || '';
 				parsed.sort( function( a, b ) {
-					var x = a.parsed,
-						y = b.parsed;
+					var x = direction ? b.parsed : a.parsed,
+						y = direction ? a.parsed : b.parsed;
 					if ( validColumn && typeof cts === 'function' ) {
 						// custom OVERALL text sorter
 						return cts( x, y, true, column, table );
@@ -4991,7 +5065,7 @@
 
 })( jQuery );
 
-/*! Widget: stickyHeaders - updated 7/31/2016 (v2.27.0) *//*
+/*! Widget: stickyHeaders - updated 1/6/2017 (v2.28.4) *//*
  * Requires tablesorter v2.8+ and jQuery 1.4.3+
  * by Rob Garrison
  */
@@ -5054,7 +5128,7 @@
 	// **************************
 	ts.addWidget({
 		id: 'stickyHeaders',
-		priority: 55, // sticky widget must be initialized after the filter widget!
+		priority: 54, // sticky widget must be initialized after the filter & before pager widget!
 		options: {
 			stickyHeaders : '',       // extra class name added to the sticky header row
 			stickyHeaders_appendTo : null, // jQuery selector or object to phycially attach the sticky headers
@@ -5294,7 +5368,7 @@
 
 })(jQuery, window);
 
-/*! Widget: resizable - updated 6/28/2016 (v2.26.5) */
+/*! Widget: resizable - updated 1/28/2017 (v2.28.5) */
 /*jshint browser:true, jquery:true, unused:false */
 ;(function ($, window) {
 	'use strict';
@@ -5317,7 +5391,7 @@
 			'.' + ts.css.resizableHandle + ' { position: absolute; display: inline-block; width: 8px;' +
 				'top: 1px; cursor: ew-resize; z-index: 3; user-select: none; -moz-user-select: none; }' +
 			'</style>';
-		$(s).appendTo('body');
+		$('head').append(s);
 	});
 
 	ts.resizable = {
@@ -5550,8 +5624,11 @@
 
 			// right click to reset columns to default widths
 			c.$table
-				.bind( 'columnUpdate' + namespace + ' pagerComplete' + namespace, function() {
+				.bind( 'columnUpdate pagerComplete resizableUpdate '.split( ' ' ).join( namespace + ' ' ), function() {
 					ts.resizable.setHandlePosition( c, wo );
+				})
+				.bind( 'resizableReset' + namespace, function() {
+					ts.resizableReset( c.table );
 				})
 				.find( 'thead:first' )
 				.add( $( c.namespace + '_extra_table' ).find( 'thead:first' ) )

@@ -1,4 +1,4 @@
-/*! tablesorter (FORK) - updated 08-22-2016 (v2.27.5)*/
+/*! tablesorter (FORK) - updated 01-28-2017 (v2.28.5)*/
 /* Includes widgets ( storage,uitheme,columns,filter,stickyHeaders,resizable,saveSort ) */
 (function(factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -10,7 +10,7 @@
 	}
 }(function(jQuery) {
 
-/*! Widget: storage - updated 3/1/2016 (v2.25.5) */
+/*! Widget: storage - updated 11/26/2016 (v2.28.0) */
 /*global JSON:false */
 ;(function ($, window, document) {
 	'use strict';
@@ -55,6 +55,17 @@
 			url = options && options.url ||
 				$table.attr(options && options.page || wo && wo.storage_page || 'data-table-page') ||
 				wo && wo.storage_fixedUrl || c && c.fixedUrl || window.location.pathname;
+		// update defaults for validator; these values must be falsy!
+		$.extend(true, ts.defaults, {
+			fixedUrl: '',
+			widgetOptions: {
+				storage_fixedUrl: '',
+				storage_group: '',
+				storage_page: '',
+				storage_tableId: '',
+				storage_useSessionStorage: ''
+			}
+		});
 		// https://gist.github.com/paulirish/5558557
 		if (storageType in window) {
 			try {
@@ -101,7 +112,7 @@
 
 })(jQuery, window, document);
 
-/*! Widget: uitheme - updated 7/31/2016 (v2.27.0) */
+/*! Widget: uitheme - updated 12/8/2016 (v2.28.1) */
 ;(function ($) {
 	'use strict';
 	var ts = $.tablesorter || {};
@@ -227,7 +238,7 @@
 						.addClass(themes.icons || '');
 				}
 				// filter widget initializes after uitheme
-				if (c.widgets.indexOf('filter') > -1) {
+				if (ts.hasWidget( c.table, 'filter' )) {
 					tmp = function() {
 						$table.children('thead').children('.' + ts.css.filterRow)
 							.removeClass(hasOldTheme ? oldtheme.filterRow || '' : '')
@@ -376,7 +387,7 @@
 
 })(jQuery);
 
-/*! Widget: filter - updated 8/22/2016 (v2.27.5) *//*
+/*! Widget: filter - updated 12/8/2016 (v2.28.1) *//*
  * Requires tablesorter v2.8+ and jQuery 1.7+
  * by Rob Garrison
  */
@@ -1200,18 +1211,29 @@
 					return;
 				}
 				// change event = no delay; last true flag tells getFilters to skip newest timed input
-				tsf.searching( table, true, true );
+				tsf.searching( table, true, true, column );
 			})
 			// include change for select - fixes #473
 			.bind( 'search change keypress input '.split( ' ' ).join( namespace + ' ' ), function( event ) {
 				// don't get cached data, in case data-column changes dynamically
-				var column = parseInt( $( this ).attr( 'data-column' ), 10 );
-				// don't allow 'change' event to process if the input value is the same - fixes #685
+				var column = parseInt( $( this ).attr( 'data-column' ), 10 ),
+					liveSearch = typeof wo.filter_liveSearch === 'boolean' ?
+						wo.filter_liveSearch :
+						ts.getColumnData( table, wo.filter_liveSearch, column );
 				if ( table.config.widgetOptions.filter_initialized &&
-					( event.which === tskeyCodes.enter || event.type === 'search' ||
-					( event.type === 'change' ) && this.value !== c.lastSearch[column] ) ||
-					// only "input" event fires in MS Edge when clicking the "x" to clear the search
-					( event.type === 'input' && this.value === '' ) ) {
+					// immediate search if user presses enter
+					( event.which === tskeyCodes.enter ||
+						// immediate search if a "search" is triggered on the input
+						event.type === 'search' ||
+						// change & input events must be ignored if liveSearch !== true
+						( event.type === 'change' || event.type === 'input' ) &&
+						// prevent search if liveSearch is a number
+						liveSearch === true &&
+						// don't allow 'change' or 'input' event to process if the input value
+						// is the same - fixes #685
+						this.value !== c.lastSearch[column]
+					)
+				) {
 					event.preventDefault();
 					// init search with no delay
 					$( this ).attr( 'data-lastSearchTime', new Date().getTime() );
@@ -1230,7 +1252,7 @@
 					wo.filter_liveSearch :
 					// get column setting, or set to fallback value, or default to false
 					ts.getColumnData( table, wo.filter_liveSearch, column );
-				if ( typeof liveSearch !== 'undefined' ) {
+				if ( typeof liveSearch === 'undefined' ) {
 					liveSearch = wo.filter_liveSearch.fallback || false;
 				}
 			}
@@ -1926,6 +1948,7 @@
 			var cts, txt, indx, len, parsedTxt, str,
 				c = table.config,
 				validColumn = typeof column !== 'undefined' && column !== null && column >= 0 && column < c.columns,
+				direction = validColumn ? c.$headerIndexed[ column ].hasClass( 'filter-select-sort-desc' ) : false,
 				parsed = [];
 			// get unique elements and sort the list
 			// if $.tablesorter.sortText exists ( not in the original tablesorter ),
@@ -1966,8 +1989,8 @@
 				// sort parsed select options
 				cts = c.textSorter || '';
 				parsed.sort( function( a, b ) {
-					var x = a.parsed,
-						y = b.parsed;
+					var x = direction ? b.parsed : a.parsed,
+						y = direction ? a.parsed : b.parsed;
 					if ( validColumn && typeof cts === 'function' ) {
 						// custom OVERALL text sorter
 						return cts( x, y, true, column, table );
@@ -2247,7 +2270,7 @@
 
 })( jQuery );
 
-/*! Widget: stickyHeaders - updated 7/31/2016 (v2.27.0) *//*
+/*! Widget: stickyHeaders - updated 1/6/2017 (v2.28.4) *//*
  * Requires tablesorter v2.8+ and jQuery 1.4.3+
  * by Rob Garrison
  */
@@ -2310,7 +2333,7 @@
 	// **************************
 	ts.addWidget({
 		id: 'stickyHeaders',
-		priority: 55, // sticky widget must be initialized after the filter widget!
+		priority: 54, // sticky widget must be initialized after the filter & before pager widget!
 		options: {
 			stickyHeaders : '',       // extra class name added to the sticky header row
 			stickyHeaders_appendTo : null, // jQuery selector or object to phycially attach the sticky headers
@@ -2550,7 +2573,7 @@
 
 })(jQuery, window);
 
-/*! Widget: resizable - updated 6/28/2016 (v2.26.5) */
+/*! Widget: resizable - updated 1/28/2017 (v2.28.5) */
 /*jshint browser:true, jquery:true, unused:false */
 ;(function ($, window) {
 	'use strict';
@@ -2573,7 +2596,7 @@
 			'.' + ts.css.resizableHandle + ' { position: absolute; display: inline-block; width: 8px;' +
 				'top: 1px; cursor: ew-resize; z-index: 3; user-select: none; -moz-user-select: none; }' +
 			'</style>';
-		$(s).appendTo('body');
+		$('head').append(s);
 	});
 
 	ts.resizable = {
@@ -2806,8 +2829,11 @@
 
 			// right click to reset columns to default widths
 			c.$table
-				.bind( 'columnUpdate' + namespace + ' pagerComplete' + namespace, function() {
+				.bind( 'columnUpdate pagerComplete resizableUpdate '.split( ' ' ).join( namespace + ' ' ), function() {
 					ts.resizable.setHandlePosition( c, wo );
+				})
+				.bind( 'resizableReset' + namespace, function() {
+					ts.resizableReset( c.table );
 				})
 				.find( 'thead:first' )
 				.add( $( c.namespace + '_extra_table' ).find( 'thead:first' ) )

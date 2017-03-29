@@ -1,33 +1,35 @@
 extends layouth
 
 block content
-	a#sign(href='/signout', class='text-center new-account') Выход
+	a.btn#sign(href='/signout', class='text-center new-account') Выход
 	br
+	.row
+		.col.s4
+			button.btn(onclick="window.location.href='/rest/add'") Добавить
 
-	.col-md-4
-		button.temp.btn.btn-default(onclick="window.location.href='/rest/add'") Добавить
-
-	.col-md-12.form-inline
-		.form-group
-			input.form-control.sel(list='years' id='year' placeholder="Год" autocomplete='off')
-			datalist#years
-				each el in yes
-					option(value=el)
-		.form-group
-			input.form-control.sel(list='branches' id='branch' placeholder="Отдел" autocomplete='off')
-			datalist#branches
-				each el in deps
-					option(value=el)
-		.form-group.fg
-			input.form-control.sel(list='partners' id='partner' placeholder="Контрагент" autocomplete='off')
-			datalist#partners
-				each el in parts
-					option(value=el)
-		.form-group.fg
-			input.form-control.sel(list='execs' id='exec' placeholder="Исполнитель" autocomplete='off')
-			datalist#execs
-					each el in exes
+	.row
+		.col.s12
+			.input-field.col.s2
+				input(list='years' id='year' placeholder="Год" autocomplete='off')
+				select#years
+					each el in yes
 						option(value=el)
-		button.form-control.sel#search(type='submit') Поиск
-	br
-	#core
+			.input-field.col.s2
+				input(list='branches' id='branch' placeholder="Отдел" autocomplete='off')
+				datalist#branches
+					each el in deps
+						option(value=el)
+			.input-field.col.s2
+				input(list='partners' id='partner' placeholder="Контрагент" autocomplete='off')
+				datalist#partners
+					each el in parts
+						option(value=el)
+			.input-field.col.s2
+				input(list='execs' id='exec' placeholder="Исполнитель" autocomplete='off')
+				datalist#execs
+						each el in exes
+							option(value=el)
+			.input-field.col.s2
+				button.btn#search(type='submit') Поиск
+		br
+		#core
